@@ -88,6 +88,33 @@ Default local URLs:
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:4000/api/v1`
 
+## DigitalOcean App Platform Deployment
+
+This repository includes an App Platform spec at `.do/app.yaml` for running both applications from one GitHub repo with auto-deploy on push.
+
+### What gets deployed
+
+- `api` service from `backend-app` at route prefix `/api`
+- `web` static site from `frontend-app` at route `/`
+- Automatic rebuild/redeploy when pushing to `master`
+
+### Setup steps
+
+1. In DigitalOcean, create a new App and choose **Use App Spec**.
+2. Upload or paste `.do/app.yaml`.
+3. Update these environment values before first deploy:
+  - `JWT_ACCESS_SECRET`
+  - `JWT_REFRESH_SECRET`
+  - `CORS_ORIGIN` (set to your deployed frontend origin, for example `https://your-app.ondigitalocean.app`)
+4. Confirm GitHub repo access for `phyowaihtoon/personal-web-profile`.
+5. Deploy.
+
+### Notes for current backend database mode
+
+- Current backend setup uses SQLite (`DATABASE_URL=file:./prisma/dev.db`) in the app spec.
+- SQLite on App Platform is suitable for demo/staging only because filesystem data is not durable across restarts/redeploys.
+- For production durability, move Prisma datasource to PostgreSQL and attach a managed database.
+
 ## Quality Checks
 
 Backend:

@@ -8,6 +8,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
+    "deploy:build": "npm run prisma:generate && npm run build && npm run prisma:push && npm run prisma:seed",
     "lint": "eslint .",
     "test": "jest --runInBand --config jest.config.cjs",
     "prisma:generate": "prisma generate",
