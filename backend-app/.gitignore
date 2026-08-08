@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+
+uploads/
+test-uploads/
+
+prisma/*.db
+prisma/*.db-journal
+
+*.log

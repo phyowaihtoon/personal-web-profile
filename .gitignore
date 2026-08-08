@@ -1,0 +1,40 @@
+# OS and editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Backend app
+backend-app/node_modules/
+backend-app/dist/
+backend-app/coverage/
+backend-app/uploads/
+backend-app/test-uploads/
+backend-app/.env
+backend-app/.env.*
+!backend-app/.env.example
+backend-app/prisma/*.db
+backend-app/prisma/*.db-journal
+backend-app/*.tsbuildinfo
+
+# Frontend app
+frontend-app/node_modules/
+frontend-app/dist/
+frontend-app/dist-ssr/
+frontend-app/coverage/
+frontend-app/.vite/
+frontend-app/.env
+frontend-app/.env.*
+!frontend-app/.env.example
+frontend-app/*.tsbuildinfo

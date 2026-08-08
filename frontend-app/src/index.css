@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f4efe7;
+  --surface: rgba(255, 250, 244, 0.86);
+  --surface-strong: #fffdf8;
+  --foreground: #201714;
+  --muted: #705a54;
+  --border: rgba(69, 43, 29, 0.14);
+  --accent: #b6561a;
+  --accent-strong: #843a0f;
+  --accent-soft: rgba(182, 86, 26, 0.12);
+  --ring: rgba(182, 86, 26, 0.24);
+  --shadow: 0 24px 80px rgba(96, 52, 25, 0.12);
+  --font-body: "Manrope", "Segoe UI", sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+  font-family: var(--font-body);
+  color: var(--foreground);
+  background:
+    radial-gradient(circle at top left, rgba(226, 164, 126, 0.24), transparent 32%),
+    linear-gradient(180deg, #f8f3eb 0%, #efe8dc 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme='dark'] {
+  --bg: #1d1715;
+  --surface: rgba(37, 30, 27, 0.88);
+  --surface-strong: #2a211d;
+  --foreground: #f7ede4;
+  --muted: #d1baaa;
+  --border: rgba(255, 235, 222, 0.12);
+  --accent: #f08b52;
+  --accent-strong: #ffb186;
+  --accent-soft: rgba(240, 139, 82, 0.16);
+  --ring: rgba(240, 139, 82, 0.28);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+  background:
+    radial-gradient(circle at top left, rgba(176, 83, 32, 0.2), transparent 32%),
+    linear-gradient(180deg, #171210 0%, #211916 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--foreground);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 30%),
+    var(--bg);
+}
+
+.glass-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.display-title {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.prose-markdown {
+  color: var(--foreground);
+  line-height: 1.75;
+}
+
+.prose-markdown h1,
+.prose-markdown h2,
+.prose-markdown h3 {
+  font-family: var(--font-display);
+}
+
+.prose-markdown pre,
+.prose-markdown code {
+  background: var(--accent-soft);
+  border-radius: 0.5rem;
+}

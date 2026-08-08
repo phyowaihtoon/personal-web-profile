@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String           @id @default(cuid())
+  email        String           @unique
+  passwordHash String
+  role         String           @default("admin")
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  sessions     RefreshSession[]
+  uploads      MediaFile[]
+}
+
+model RefreshSession {
+  id               String     @id @default(cuid())
+  adminUserId      String
+  sessionTokenHash String     @unique
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  userAgent        String?
+  ipAddress        String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  adminUser        AdminUser  @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+}
+
+model MediaFile {
+  id           String     @id @default(cuid())
+  originalName String
+  storedName   String
+  mimeType     String
+  size         Int
+  path         String
+  kind         String
+  uploadedById String?
+  createdAt    DateTime   @default(now())
+  uploadedBy   AdminUser? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+}
+
+model SiteSetting {
+  id                        String   @id @default("site-settings")
+  siteTitle                 Json?
+  defaultLocale             String   @default("en")
+  seoDefaultTitle           Json?
+  seoDefaultDescription     Json?
+  logoMediaId               String?
+  faviconMediaId            String?
+  socialLinks               Json?
+  contactInfo               Json?
+  analyticsScriptIds        Json?
+  homepageSectionVisibility Json?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+}
+
+model HomePage {
+  id                String   @id @default("home-page")
+  heroImageMediaId  String?
+  featuredProjectLimit Int   @default(3)
+  latestBlogLimit   Int      @default(3)
+  translations      Json?
+  sectionVisibility Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model AboutPage {
+  id             String   @id @default("about-page")
+  profileMediaId String?
+  translations   Json?
+  careerTimeline Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ExperienceItem {
+  id                String   @id @default(cuid())
+  company           String
+  startDate         DateTime
+  endDate           DateTime?
+  isCurrent         Boolean  @default(false)
+  sortOrder         Int      @default(0)
+  isVisible         Boolean  @default(true)
+  translations      Json?
+  technologies      Json?
+  featuredProjectIds Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Skill {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  categoryKey  String
+  sortOrder    Int      @default(0)
+  isVisible    Boolean  @default(true)
+  translations Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Project {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  featuredImageMediaId String?
+  githubUrl        String?
+  demoUrl          String?
+  isFeatured       Boolean  @default(false)
+  isPublished      Boolean  @default(false)
+  publishedAt      DateTime?
+  sortOrder        Int      @default(0)
+  translations     Json?
+  categories       Json?
+  technologies     Json?
+  galleryMediaIds  Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model BlogCategory {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  translations Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model BlogTag {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  translations Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model BlogPost {
+  id                  String   @id @default(cuid())
+  slug                String   @unique
+  status              String   @default("draft")
+  featuredImageMediaId String?
+  readingTimeMinutes  Int      @default(1)
+  publishedAt         DateTime?
+  translations        Json?
+  categoryIds         Json?
+  tagIds              Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}

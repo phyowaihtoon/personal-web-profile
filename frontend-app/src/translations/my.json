@@ -1,0 +1,45 @@
+{
+  "brand": {
+    "title": "ကိုယ်ပိုင်ဝဘ်ဆိုက်စနစ်"
+  },
+  "nav": {
+    "home": "ပင်မ",
+    "about": "အကြောင်း",
+    "experience": "အတွေ့အကြုံ",
+    "blog": "ဘလော့"
+  },
+  "footer": {
+    "tagline": "Content-driven public site နှင့် admin portal.",
+    "admin": "Admin portal"
+  },
+  "states": {
+    "loading": "တင်နေသည်",
+    "loadingContent": "Backend API မှ အကြောင်းအရာများကို ရယူနေသည်။",
+    "error": "အမှားတစ်ခုဖြစ်ပွားသည်",
+    "errorContent": "Backend မှ စာမျက်နှာအချက်အလက်ကို မရရှိနိုင်ပါ။"
+  },
+  "home": {
+    "eyebrow": "Public website",
+    "fallbackTitle": "Backend content ဖြင့် ထိန်းချုပ်ထားသော modular website platform.",
+    "fallbackSubtitle": "Public content, blog entries နှင့် admin editing တို့ကို synchronize လုပ်ထားသည်။",
+    "fallbackIntro": "Public portal ကို backend CMS content ဖြင့် render လုပ်သည်။",
+    "skillsTitle": "Tech Stack",
+    "skillsOverview": "Frontend သည် hardcoded text အစား API data ကိုအသုံးပြုသည်။",
+    "featuredProjects": "ရွေးချယ်ထားသော projects",
+    "latestPosts": "နောက်ဆုံး posts"
+  },
+  "about": {
+    "title": "အကြောင်း",
+    "timelineTitle": "Career timeline"
+  },
+  "experience": {
+    "title": "အတွေ့အကြုံ",
+    "skillsTitle": "Skills overview"
+  },
+  "blog": {
+    "title": "ရေးသားချက်များ",
+    "description": "Search နှင့် related content ပါဝင်သော published Markdown posts များ။",
+    "searchPlaceholder": "Title သို့မဟုတ် content ဖြင့် search လုပ်ပါ",
+    "relatedPosts": "ဆက်စပ် posts"
+  }
+}

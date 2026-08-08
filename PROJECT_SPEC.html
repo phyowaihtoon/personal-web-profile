@@ -1,0 +1,1651 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Website Project Specification</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-alt: #f1f5f9;
+        --text: #0f172a;
+        --muted: #475569;
+        --border: #dbe3ee;
+        --accent: #2563eb;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+
+      .layout {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      header {
+        padding: 32px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(135deg, #eff6ff, #ffffff);
+      }
+
+      header h1 {
+        margin: 0 0 8px;
+        font-size: 2rem;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      nav {
+        padding: 20px 32px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface-alt);
+      }
+
+      nav h2 {
+        margin: 0 0 12px;
+        font-size: 1rem;
+      }
+
+      nav ul {
+        margin: 0;
+        padding-left: 20px;
+        columns: 2;
+      }
+
+      nav a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      main {
+        padding: 32px;
+      }
+
+      h2 {
+        margin-top: 2rem;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        margin-top: 1.5rem;
+        font-size: 1.15rem;
+      }
+
+      h4 {
+        margin-top: 1rem;
+        font-size: 1rem;
+      }
+
+      p,
+      li {
+        color: var(--text);
+      }
+
+      ul,
+      ol {
+        padding-left: 22px;
+      }
+
+      code {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 6px;
+        padding: 2px 6px;
+        font-family: Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 10px 12px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--surface-alt);
+      }
+
+      hr {
+        border: 0;
+        border-top: 1px solid var(--border);
+        margin: 28px 0;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      @media (max-width: 768px) {
+        nav ul {
+          columns: 1;
+        }
+
+        header,
+        nav,
+        main {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <div class="card">
+        <header>
+          <h1>Personal Website Project Specification</h1>
+          <p>Static HTML version of <code>PROJECT_SPEC.md</code></p>
+        </header>
+
+        <nav>
+          <h2>Contents</h2>
+          <ul>
+            <li><a href="#section-1">1. Project Overview</a></li>
+            <li><a href="#section-2">2. Goals</a></li>
+            <li><a href="#section-3">3. Scope</a></li>
+            <li><a href="#section-4">4. Technology Stack</a></li>
+            <li><a href="#section-5">5. Users and Roles</a></li>
+            <li><a href="#section-6">6. Authentication and Authorization</a></li>
+            <li><a href="#section-7">7. Public Website Functional Requirements</a></li>
+            <li><a href="#section-8">8. Admin Portal Functional Requirements</a></li>
+            <li><a href="#section-9">9. Non-Functional Requirements</a></li>
+            <li><a href="#section-10">10. Content and Localization Rules</a></li>
+            <li><a href="#section-11">11. Data Model Overview</a></li>
+            <li><a href="#section-12">12. API Overview</a></li>
+            <li><a href="#section-13">13. UI Overview</a></li>
+            <li><a href="#section-14">14. Workflows</a></li>
+            <li><a href="#section-15">15. Permissions Matrix</a></li>
+            <li><a href="#section-16">16. Architecture</a></li>
+            <li><a href="#section-17">17. Testing Requirements</a></li>
+            <li><a href="#section-18">18. Implementation Milestones</a></li>
+            <li><a href="#section-19">19. Acceptance Criteria Summary</a></li>
+            <li><a href="#section-20">20. Future Considerations</a></li>
+          </ul>
+        </nav>
+
+        <main>
+          <section id="section-1">
+            <h2>1. Project Overview</h2>
+            <p>This project is a personal website platform with two main surfaces:</p>
+            <ol>
+              <li>
+                <strong>Public Website</strong>
+                <ul>
+                  <li>Home</li>
+                  <li>About</li>
+                  <li>Experience</li>
+                  <li>Blog</li>
+                  <li>Contact/social information</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Admin Portal</strong>
+                <ul>
+                  <li>Secure admin authentication</li>
+                  <li>Content management for all public sections</li>
+                  <li>Blog management</li>
+                  <li>File upload management</li>
+                  <li>Site settings management</li>
+                  <li>Localization management</li>
+                  <li>Dashboard</li>
+                </ul>
+              </li>
+            </ol>
+            <p>
+              The system is <strong>content-driven from the backend</strong>. Public pages must not rely on hardcoded content except for structural UI.
+            </p>
+            <p>The platform must support:</p>
+            <ul>
+              <li><strong>English</strong> and <strong>Myanmar</strong></li>
+              <li><strong>Light/Dark/System theme</strong></li>
+              <li><strong>JWT authentication</strong></li>
+              <li><strong>API versioning</strong></li>
+              <li><strong>Clean modular architecture</strong></li>
+              <li><strong>Future extensibility for multi-admin support</strong></li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-2">
+            <h2>2. Goals</h2>
+
+            <h3>Primary Goals</h3>
+            <ul>
+              <li>Provide a professional personal website with structured, manageable content.</li>
+              <li>Enable secure admin-only content management.</li>
+              <li>Support bilingual content and UI.</li>
+              <li>Deliver a maintainable codebase with clean separation of concerns.</li>
+              <li>Establish a strong V1 foundation for future expansion.</li>
+            </ul>
+
+            <h3>V1 Priority Order</h3>
+            <ol>
+              <li>Admin Authentication</li>
+              <li>Content Management (CMS)</li>
+              <li>Public Website</li>
+              <li>Blog System</li>
+              <li>Image/File Upload</li>
+              <li>Social links/contact information</li>
+              <li>Localization</li>
+              <li>Analytics placeholder only via settings, no active integration required</li>
+            </ol>
+          </section>
+
+          <hr />
+
+          <section id="section-3">
+            <h2>3. Scope</h2>
+
+            <h3>In Scope for V1</h3>
+
+            <h4>Public Website</h4>
+            <ul>
+              <li>Home page</li>
+              <li>About page</li>
+              <li>Experience page</li>
+              <li>Blog listing and blog detail pages</li>
+              <li>Simple contact/social information display</li>
+              <li>Language switcher</li>
+              <li>Theme switcher</li>
+              <li>SEO metadata support</li>
+              <li>Responsive UI</li>
+            </ul>
+
+            <h4>Admin Portal</h4>
+            <ul>
+              <li>Bootstrap admin creation</li>
+              <li>Login</li>
+              <li>Access token + refresh token flow</li>
+              <li>Token verification</li>
+              <li>Dashboard</li>
+              <li>
+                Manage:
+                <ul>
+                  <li>Home content</li>
+                  <li>About content</li>
+                  <li>Experience entries</li>
+                  <li>Projects</li>
+                  <li>Skills</li>
+                  <li>Blog posts</li>
+                  <li>Blog categories</li>
+                  <li>Blog tags</li>
+                  <li>Site settings</li>
+                  <li>Uploaded files</li>
+                </ul>
+              </li>
+              <li>View contact/social information settings</li>
+              <li>Localized content editing</li>
+              <li>Draft/publish workflow for blog</li>
+            </ul>
+
+            <h4>Backend/API</h4>
+            <ul>
+              <li>Public read APIs</li>
+              <li>Admin CRUD APIs</li>
+              <li>Auth APIs</li>
+              <li>File upload APIs</li>
+              <li>API versioning under <code>/api/v1</code></li>
+            </ul>
+
+            <h4>Testing</h4>
+            <ul>
+              <li>Frontend unit/component tests</li>
+              <li>Backend unit tests</li>
+              <li>Backend integration tests where practical</li>
+            </ul>
+
+            <h3>Out of Scope for V1</h3>
+            <ul>
+              <li>Public user accounts</li>
+              <li>Comments</li>
+              <li>Newsletter</li>
+              <li>End-to-end tests</li>
+              <li>Multi-role admin permissions</li>
+              <li>Cloud media storage</li>
+              <li>Analytics integration implementation</li>
+              <li>Advanced search ranking</li>
+              <li>Real-time editing or collaboration</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-4">
+            <h2>4. Technology Stack</h2>
+
+            <h3>Frontend</h3>
+            <ul>
+              <li>React</li>
+              <li>Vite</li>
+              <li>TypeScript</li>
+              <li>React Query</li>
+              <li>React Router</li>
+              <li>React Hook Form</li>
+              <li>shadcn/ui</li>
+              <li>Tailwind CSS</li>
+              <li>Lucide Icons</li>
+              <li>JWT auth integration</li>
+              <li>English/Myanmar localization</li>
+              <li>Light/Dark/System theme support</li>
+              <li>Vitest for testing</li>
+            </ul>
+
+            <h3>Backend</h3>
+            <ul>
+              <li>Express</li>
+              <li>TypeScript</li>
+              <li>Prisma</li>
+              <li>SQLite for local development and testing</li>
+              <li>PostgreSQL for production</li>
+              <li>Express Validator</li>
+              <li>CORS</li>
+              <li>JWT authentication</li>
+              <li>API versioning</li>
+              <li>Jest and Supertest for testing</li>
+              <li>ESLint + TypeScript ESLint</li>
+              <li><code>tsx</code> for development watch mode</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-5">
+            <h2>5. Users and Roles</h2>
+
+            <h3>User Types</h3>
+
+            <h4>Public Visitor</h4>
+            <ul>
+              <li>Can browse all published public content</li>
+              <li>Can switch language</li>
+              <li>Can switch theme</li>
+              <li>Can search blog content</li>
+              <li>Cannot access admin features</li>
+            </ul>
+
+            <h4>Admin</h4>
+            <ul>
+              <li>Single role in V1: <code>admin</code></li>
+              <li>Can log in to admin portal</li>
+              <li>Can manage all content and settings</li>
+              <li>Can upload files</li>
+              <li>Can create, edit, publish, unpublish, and delete blog content</li>
+              <li>Can manage localized content</li>
+              <li>Can view protected admin dashboard and resources</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-6">
+            <h2>6. Authentication and Authorization</h2>
+
+            <h3>Authentication Model</h3>
+            <ul>
+              <li>
+                <strong>Access Token</strong>
+                <ul>
+                  <li>JWT</li>
+                  <li>Used for authenticated API requests</li>
+                  <li>Stored in frontend memory only</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Refresh Token</strong>
+                <ul>
+                  <li>Stored in <strong>httpOnly secure cookie</strong></li>
+                  <li>Used to refresh session safely</li>
+                </ul>
+              </li>
+            </ul>
+
+            <h3>Admin Registration Model</h3>
+            <ul>
+              <li>No public registration</li>
+              <li>Initial admin account is created through <strong>bootstrap-only flow</strong></li>
+              <li>Bootstrap flow must be available only until the first admin exists</li>
+              <li>After initial setup, further admin creation is out of scope for V1</li>
+            </ul>
+
+            <h3>Required Auth Endpoints</h3>
+            <ul>
+              <li><code>POST /api/v1/auth/bootstrap</code> (available only when no admin exists)</li>
+              <li><code>POST /api/v1/auth/login</code></li>
+              <li><code>POST /api/v1/auth/refresh</code></li>
+              <li><code>POST /api/v1/auth/logout</code></li>
+              <li><code>GET /api/v1/auth/me</code></li>
+              <li><code>POST /api/v1/auth/verify</code></li>
+            </ul>
+
+            <h3>Authorization Model</h3>
+            <ul>
+              <li>All admin APIs require authenticated admin access</li>
+              <li>All content management actions require admin role</li>
+              <li>Public APIs expose only published/public-safe content</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-7">
+            <h2>7. Public Website Functional Requirements</h2>
+
+            <h3>7.1 Home Page</h3>
+            <p>The Home page must support:</p>
+            <ul>
+              <li>Hero section</li>
+              <li>Professional introduction</li>
+              <li>Latest blog posts (3 to 5)</li>
+              <li>Skills overview</li>
+              <li>Experience summary</li>
+            </ul>
+            <p>All content must come from backend-managed CMS content.</p>
+
+            <h3>7.2 About Page</h3>
+            <p>The About page must support:</p>
+            <ul>
+              <li>Biography</li>
+              <li>Professional photo</li>
+              <li>Technical skills</li>
+              <li>Career timeline</li>
+              <li>Interests and learning journey</li>
+            </ul>
+
+            <h3>7.3 Experience Page</h3>
+            <p>The Experience page must support:</p>
+            <ul>
+              <li>Work experience entries</li>
+              <li>Featured projects</li>
+              <li>Technology stack references</li>
+            </ul>
+
+            <h3>7.4 Blog</h3>
+            <p>The Blog must support:</p>
+            <ul>
+              <li>Blog listing page</li>
+              <li>Individual blog detail pages</li>
+              <li>Categories</li>
+              <li>Tags</li>
+              <li>Simple keyword search</li>
+              <li>Related posts</li>
+              <li>Featured image</li>
+              <li>Slug-based URLs</li>
+              <li>SEO metadata</li>
+              <li>Reading time</li>
+              <li>Draft/published workflow on admin side</li>
+              <li>Public exposure of published content only</li>
+            </ul>
+
+            <h3>7.5 Contact / Social Information</h3>
+            <p>V1 must include:</p>
+            <ul>
+              <li>Social links</li>
+              <li>Contact information display</li>
+            </ul>
+            <p>V1 must <strong>not</strong> include a contact form.</p>
+
+            <h3>7.6 Localization</h3>
+            <p>The public website must support:</p>
+            <ul>
+              <li>English</li>
+              <li>Myanmar</li>
+            </ul>
+            <p>The language toggle must affect:</p>
+            <ul>
+              <li>UI labels</li>
+              <li>Page content</li>
+              <li>Blog content</li>
+            </ul>
+            <p>If Myanmar content is missing, the frontend must <strong>fallback to English</strong>.</p>
+
+            <h3>7.7 Theme</h3>
+            <p>The public website must support:</p>
+            <ul>
+              <li>System default theme</li>
+              <li>Light theme</li>
+              <li>Dark theme</li>
+            </ul>
+            <p>Theme selection must persist between visits.</p>
+          </section>
+
+          <hr />
+
+          <section id="section-8">
+            <h2>8. Admin Portal Functional Requirements</h2>
+
+            <h3>8.1 Admin Dashboard</h3>
+            <p>The dashboard should provide a simple operational overview, such as:</p>
+            <ul>
+              <li>Content counts</li>
+              <li>Blog draft/published counts</li>
+              <li>Recent blog posts</li>
+              <li>Recent uploads</li>
+              <li>System status summary</li>
+            </ul>
+
+            <h3>8.2 Content Management Modules</h3>
+
+            <h4>Home Content Management</h4>
+            <p>Admin can manage localized content for:</p>
+            <ul>
+              <li>Hero</li>
+              <li>Intro</li>
+              <li>Featured project selection</li>
+              <li>Latest blog section title/content</li>
+              <li>Skills overview content</li>
+              <li>Experience summary content</li>
+              <li>Section visibility</li>
+            </ul>
+
+            <h4>About Management</h4>
+            <p>Admin can manage localized content for:</p>
+            <ul>
+              <li>Biography</li>
+              <li>Professional photo reference</li>
+              <li>Technical skills section content</li>
+              <li>Career timeline content</li>
+              <li>Interests and learning journey</li>
+            </ul>
+
+            <h4>Experience Management</h4>
+            <p>Admin can manage:</p>
+            <ul>
+              <li>Experience entries</li>
+              <li>Dates</li>
+              <li>Titles</li>
+              <li>Organization/company</li>
+              <li>Descriptions</li>
+              <li>Technologies</li>
+              <li>Ordering</li>
+              <li>Visibility</li>
+            </ul>
+
+            <h4>Projects Management</h4>
+            <p>Admin can manage:</p>
+            <ul>
+              <li>Project title</li>
+              <li>Slug</li>
+              <li>Summary</li>
+              <li>Full description</li>
+              <li>Categories</li>
+              <li>Technologies</li>
+              <li>Featured image</li>
+              <li>Gallery/files</li>
+              <li>GitHub URL</li>
+              <li>Demo URL</li>
+              <li>Featured flag</li>
+              <li>Publish visibility</li>
+            </ul>
+
+            <h4>Skills Management</h4>
+            <p>Admin can manage:</p>
+            <ul>
+              <li>Skill names</li>
+              <li>Categories/groups</li>
+              <li>Ordering</li>
+              <li>Optional description or level</li>
+              <li>Visibility</li>
+            </ul>
+
+            <h4>Blog Management</h4>
+            <p>Admin can manage:</p>
+            <ul>
+              <li>Post title</li>
+              <li>Slug</li>
+              <li>Excerpt</li>
+              <li>Content</li>
+              <li>Canonical content format: <strong>Markdown</strong></li>
+              <li>Rich editor UI for authoring</li>
+              <li>Featured image</li>
+              <li>Categories</li>
+              <li>Tags</li>
+              <li>Draft/published state</li>
+              <li>Published date</li>
+              <li>SEO title</li>
+              <li>SEO description</li>
+              <li>Open Graph image</li>
+              <li>Reading time</li>
+              <li>Related post logic inputs if manually supported</li>
+            </ul>
+
+            <h4>Site Settings Management</h4>
+            <p>Admin can manage:</p>
+            <ul>
+              <li>Site title</li>
+              <li>SEO defaults</li>
+              <li>Logo</li>
+              <li>Favicon</li>
+              <li>Social links</li>
+              <li>Contact information</li>
+              <li>Homepage section visibility</li>
+              <li>Analytics script IDs</li>
+            </ul>
+
+            <h4>File Upload Management</h4>
+            <p>Admin can upload and manage:</p>
+            <ul>
+              <li>Images</li>
+              <li>Documents/files</li>
+            </ul>
+            <p>Storage for V1:</p>
+            <ul>
+              <li>Local file storage</li>
+            </ul>
+            <p>The design must allow replacement with cloud storage later.</p>
+
+            <h3>8.3 Admin Localization</h3>
+            <p>Localization must apply to:</p>
+            <ul>
+              <li>Public site</li>
+              <li>Admin UI</li>
+              <li>Admin-managed content</li>
+            </ul>
+
+            <h3>8.4 Validation and Error Handling</h3>
+            <p>Admin actions must include:</p>
+            <ul>
+              <li>Request validation</li>
+              <li>Clear field-level validation errors</li>
+              <li>Standard API error responses</li>
+              <li>Unauthorized handling</li>
+              <li>Expired-session handling with refresh flow</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-9">
+            <h2>9. Non-Functional Requirements</h2>
+
+            <h3>9.1 Performance</h3>
+            <ul>
+              <li>Lighthouse score target: <strong>90 or higher</strong></li>
+              <li>Public pages should be optimized for fast load and rendering</li>
+              <li>Images should support size-conscious rendering strategy</li>
+              <li>Avoid unnecessary frontend bundle growth</li>
+            </ul>
+
+            <h3>9.2 SEO</h3>
+            <p>Must support:</p>
+            <ul>
+              <li>SEO-friendly URLs</li>
+              <li>Metadata per page/post</li>
+              <li>Open Graph tags</li>
+              <li>Structured Data where relevant</li>
+              <li><code>sitemap.xml</code></li>
+              <li><code>robots.txt</code></li>
+            </ul>
+
+            <h3>9.3 Accessibility</h3>
+            <ul>
+              <li>Target: <strong>WCAG 2.1 AA</strong></li>
+              <li>Keyboard navigation support</li>
+              <li>Semantic HTML</li>
+              <li>Accessible forms</li>
+              <li>Contrast-safe themes</li>
+              <li>Proper labels and focus states</li>
+            </ul>
+
+            <h3>9.4 Responsiveness</h3>
+            <p>Must support:</p>
+            <ul>
+              <li>Mobile</li>
+              <li>Tablet</li>
+              <li>Desktop</li>
+            </ul>
+
+            <h3>9.5 Browser Support</h3>
+            <p>Support latest stable versions of:</p>
+            <ul>
+              <li>Chrome</li>
+              <li>Edge</li>
+              <li>Firefox</li>
+              <li>Safari</li>
+            </ul>
+
+            <h3>9.6 Maintainability</h3>
+            <ul>
+              <li>Clean modular architecture</li>
+              <li>Shared conventions across frontend and backend</li>
+              <li>Clear domain separation</li>
+              <li>Reusable components/services</li>
+              <li>Versioned API</li>
+              <li>Environment-based configuration</li>
+            </ul>
+
+            <h3>9.7 Security</h3>
+            <ul>
+              <li>Password hashing</li>
+              <li>Secure JWT handling</li>
+              <li>httpOnly secure refresh cookies</li>
+              <li>Input validation</li>
+              <li>Controlled CORS configuration</li>
+              <li>Protection against invalid file uploads</li>
+              <li>No sensitive error leakage in production</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-10">
+            <h2>10. Content and Localization Rules</h2>
+
+            <h3>Required Localization Behavior</h3>
+            <p>All CMS-managed content must support localization for:</p>
+            <ul>
+              <li>English</li>
+              <li>Myanmar</li>
+            </ul>
+
+            <p>This includes:</p>
+            <ul>
+              <li>Home content</li>
+              <li>About content</li>
+              <li>Experience content</li>
+              <li>Project content</li>
+              <li>Blog content</li>
+              <li>Site settings where user-facing text is shown</li>
+              <li>Admin UI labels</li>
+            </ul>
+
+            <h3>Fallback Rule</h3>
+            <p>If requested Myanmar content is not available:</p>
+            <ul>
+              <li>Return or render English fallback content</li>
+            </ul>
+
+            <h3>Slug Behavior</h3>
+            <ul>
+              <li>Slugs should be stable and unique</li>
+              <li>Slug strategy may remain single canonical slug per resource in V1</li>
+              <li>UI content is localized, but routing can remain canonical by slug</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-11">
+            <h2>11. Data Model Overview</h2>
+            <p>The following is the minimum recommended conceptual model.</p>
+
+            <h3>11.1 Authentication</h3>
+
+            <h4>AdminUser</h4>
+            <ul>
+              <li>id</li>
+              <li>email</li>
+              <li>passwordHash</li>
+              <li>role</li>
+              <li>isActive</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h4>RefreshSession</h4>
+            <ul>
+              <li>id</li>
+              <li>adminUserId</li>
+              <li>tokenHash or session identifier</li>
+              <li>expiresAt</li>
+              <li>createdAt</li>
+              <li>revokedAt</li>
+              <li>userAgent</li>
+              <li>ipAddress</li>
+            </ul>
+
+            <h3>11.2 Media</h3>
+
+            <h4>MediaFile</h4>
+            <ul>
+              <li>id</li>
+              <li>originalName</li>
+              <li>storedName</li>
+              <li>mimeType</li>
+              <li>size</li>
+              <li>path</li>
+              <li>kind</li>
+              <li>uploadedBy</li>
+              <li>createdAt</li>
+            </ul>
+
+            <h3>11.3 Site Settings</h3>
+
+            <h4>SiteSetting</h4>
+            <ul>
+              <li>id</li>
+              <li>siteTitle</li>
+              <li>defaultLocale</li>
+              <li>seoDefaultTitle</li>
+              <li>seoDefaultDescription</li>
+              <li>logoMediaId</li>
+              <li>faviconMediaId</li>
+              <li>socialLinks</li>
+              <li>contactInfo</li>
+              <li>analyticsScriptIds</li>
+              <li>homepageSectionVisibility</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h3>11.4 Home Content</h3>
+
+            <h4>HomePage</h4>
+            <ul>
+              <li>id</li>
+              <li>heroImageMediaId</li>
+              <li>featuredProjectLimit</li>
+              <li>latestBlogLimit</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h4>HomePageTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>homePageId</li>
+              <li>locale</li>
+              <li>heroTitle</li>
+              <li>heroSubtitle</li>
+              <li>introText</li>
+              <li>skillsOverviewText</li>
+              <li>experienceSummaryText</li>
+              <li>latestBlogHeading</li>
+              <li>featuredProjectsHeading</li>
+            </ul>
+
+            <h3>11.5 About Content</h3>
+
+            <h4>AboutPage</h4>
+            <ul>
+              <li>id</li>
+              <li>profileMediaId</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h4>AboutPageTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>aboutPageId</li>
+              <li>locale</li>
+              <li>biography</li>
+              <li>technicalSkillsText</li>
+              <li>interestsText</li>
+              <li>learningJourneyText</li>
+            </ul>
+
+            <h4>CareerTimelineItem</h4>
+            <ul>
+              <li>id</li>
+              <li>aboutPageId</li>
+              <li>order</li>
+              <li>startDate</li>
+              <li>endDate</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h4>CareerTimelineItemTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>careerTimelineItemId</li>
+              <li>locale</li>
+              <li>title</li>
+              <li>subtitle</li>
+              <li>description</li>
+            </ul>
+
+            <h3>11.6 Experience</h3>
+
+            <h4>ExperienceItem</h4>
+            <ul>
+              <li>id</li>
+              <li>company</li>
+              <li>startDate</li>
+              <li>endDate</li>
+              <li>isCurrent</li>
+              <li>order</li>
+              <li>isVisible</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h4>ExperienceItemTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>experienceItemId</li>
+              <li>locale</li>
+              <li>roleTitle</li>
+              <li>summary</li>
+              <li>description</li>
+            </ul>
+
+            <h4>ExperienceTechnology</h4>
+            <ul>
+              <li>id</li>
+              <li>experienceItemId</li>
+              <li>name</li>
+              <li>order</li>
+            </ul>
+
+            <h3>11.7 Skills</h3>
+
+            <h4>Skill</h4>
+            <ul>
+              <li>id</li>
+              <li>slug</li>
+              <li>categoryKey</li>
+              <li>order</li>
+              <li>isVisible</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h4>SkillTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>skillId</li>
+              <li>locale</li>
+              <li>name</li>
+              <li>description</li>
+            </ul>
+
+            <h3>11.8 Projects</h3>
+
+            <h4>Project</h4>
+            <ul>
+              <li>id</li>
+              <li>slug</li>
+              <li>featuredImageMediaId</li>
+              <li>githubUrl</li>
+              <li>demoUrl</li>
+              <li>isFeatured</li>
+              <li>isPublished</li>
+              <li>publishedAt</li>
+              <li>order</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h4>ProjectTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>projectId</li>
+              <li>locale</li>
+              <li>title</li>
+              <li>summary</li>
+              <li>description</li>
+              <li>seoTitle</li>
+              <li>seoDescription</li>
+            </ul>
+
+            <h4>ProjectCategory</h4>
+            <ul>
+              <li>id</li>
+              <li>slug</li>
+              <li>createdAt</li>
+            </ul>
+
+            <h4>ProjectCategoryTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>projectCategoryId</li>
+              <li>locale</li>
+              <li>name</li>
+            </ul>
+
+            <h4>ProjectTechnology</h4>
+            <ul>
+              <li>id</li>
+              <li>projectId</li>
+              <li>name</li>
+              <li>order</li>
+            </ul>
+
+            <h3>11.9 Blog</h3>
+
+            <h4>BlogPost</h4>
+            <ul>
+              <li>id</li>
+              <li>slug</li>
+              <li>status</li>
+              <li>featuredImageMediaId</li>
+              <li>readingTimeMinutes</li>
+              <li>publishedAt</li>
+              <li>createdAt</li>
+              <li>updatedAt</li>
+            </ul>
+
+            <h4>BlogPostTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>blogPostId</li>
+              <li>locale</li>
+              <li>title</li>
+              <li>excerpt</li>
+              <li>contentMarkdown</li>
+              <li>seoTitle</li>
+              <li>seoDescription</li>
+            </ul>
+
+            <h4>BlogCategory</h4>
+            <ul>
+              <li>id</li>
+              <li>slug</li>
+              <li>createdAt</li>
+            </ul>
+
+            <h4>BlogCategoryTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>blogCategoryId</li>
+              <li>locale</li>
+              <li>name</li>
+            </ul>
+
+            <h4>BlogTag</h4>
+            <ul>
+              <li>id</li>
+              <li>slug</li>
+              <li>createdAt</li>
+            </ul>
+
+            <h4>BlogTagTranslation</h4>
+            <ul>
+              <li>id</li>
+              <li>blogTagId</li>
+              <li>locale</li>
+              <li>name</li>
+            </ul>
+
+            <h4>BlogPostCategory</h4>
+            <ul>
+              <li>blogPostId</li>
+              <li>blogCategoryId</li>
+            </ul>
+
+            <h4>BlogPostTag</h4>
+            <ul>
+              <li>blogPostId</li>
+              <li>blogTagId</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-12">
+            <h2>12. API Overview</h2>
+
+            <p>Base path:</p>
+            <ul>
+              <li><code>/api/v1</code></li>
+            </ul>
+
+            <h3>12.1 Response Conventions</h3>
+            <p>Recommended API response shape:</p>
+            <ul>
+              <li>success responses return <code>data</code></li>
+              <li>list responses return <code>data</code> + <code>meta</code></li>
+              <li>error responses return <code>error</code></li>
+            </ul>
+
+            <p>Example structure:</p>
+            <ul>
+              <li><code>data</code></li>
+              <li><code>meta</code></li>
+              <li><code>error.code</code></li>
+              <li><code>error.message</code></li>
+              <li><code>error.details</code></li>
+            </ul>
+
+            <h3>12.2 Auth APIs</h3>
+            <ul>
+              <li><code>POST /api/v1/auth/bootstrap</code> (bootstrap-only; disabled after first admin)</li>
+              <li><code>POST /api/v1/auth/login</code></li>
+              <li><code>POST /api/v1/auth/refresh</code></li>
+              <li><code>POST /api/v1/auth/logout</code></li>
+              <li><code>GET /api/v1/auth/me</code></li>
+              <li><code>POST /api/v1/auth/verify</code></li>
+            </ul>
+
+            <h3>12.3 Public APIs</h3>
+
+            <h4>Site/Settings</h4>
+            <ul>
+              <li><code>GET /api/v1/public/site-settings</code></li>
+              <li><code>GET /api/v1/public/navigation</code></li>
+              <li><code>GET /api/v1/public/home</code> (includes latest blog posts)</li>
+              <li><code>GET /api/v1/public/about</code></li>
+              <li><code>GET /api/v1/public/experience</code> (may include experience-linked featured projects)</li>
+              <li><code>GET /api/v1/public/skills</code></li>
+            </ul>
+
+            <h4>Blog</h4>
+            <ul>
+              <li><code>GET /api/v1/public/blog/posts</code></li>
+              <li><code>GET /api/v1/public/blog/posts/:slug</code></li>
+              <li><code>GET /api/v1/public/blog/categories</code></li>
+              <li><code>GET /api/v1/public/blog/tags</code></li>
+              <li><code>GET /api/v1/public/blog/search</code></li>
+            </ul>
+
+            <p>Public APIs must return only published/visible content.</p>
+
+            <h3>12.4 Admin APIs</h3>
+
+            <h4>Dashboard</h4>
+            <ul>
+              <li><code>GET /admin/dashboard</code></li>
+            </ul>
+
+            <h4>Home/About/Experience/Skills</h4>
+            <ul>
+              <li>CRUD endpoints for each module</li>
+              <li>Localized field support per resource</li>
+            </ul>
+
+            <h4>Projects</h4>
+            <ul>
+              <li><code>GET /admin/projects</code></li>
+              <li><code>POST /admin/projects</code></li>
+              <li><code>GET /admin/projects/:id</code></li>
+              <li><code>PATCH /admin/projects/:id</code></li>
+              <li><code>DELETE /admin/projects/:id</code></li>
+            </ul>
+
+            <h4>Blog</h4>
+            <ul>
+              <li><code>GET /admin/blog/posts</code></li>
+              <li><code>POST /admin/blog/posts</code></li>
+              <li><code>GET /admin/blog/posts/:id</code></li>
+              <li><code>PATCH /admin/blog/posts/:id</code></li>
+              <li><code>DELETE /admin/blog/posts/:id</code></li>
+              <li><code>GET /admin/blog/categories</code></li>
+              <li><code>POST /admin/blog/categories</code></li>
+              <li><code>PATCH /admin/blog/categories/:id</code></li>
+              <li><code>DELETE /admin/blog/categories/:id</code></li>
+              <li><code>GET /admin/blog/tags</code></li>
+              <li><code>POST /admin/blog/tags</code></li>
+              <li><code>PATCH /admin/blog/tags/:id</code></li>
+              <li><code>DELETE /admin/blog/tags/:id</code></li>
+            </ul>
+
+            <h4>Files</h4>
+            <ul>
+              <li><code>POST /admin/uploads</code></li>
+              <li><code>GET /admin/uploads</code></li>
+              <li><code>DELETE /admin/uploads/:id</code></li>
+            </ul>
+
+            <h4>Settings</h4>
+            <ul>
+              <li><code>GET /admin/settings</code></li>
+              <li><code>PATCH /admin/settings</code></li>
+            </ul>
+
+            <h3>12.5 Query Parameters</h3>
+            <p>Recommended common query support:</p>
+            <ul>
+              <li><code>lang=en|my</code></li>
+              <li>pagination: <code>page</code>, <code>pageSize</code></li>
+              <li>sorting where needed</li>
+              <li>filtering by category/tag/status</li>
+              <li>search keyword parameter, e.g. <code>q</code></li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-13">
+            <h2>13. UI Overview</h2>
+
+            <h3>13.1 Public UI</h3>
+
+            <h4>Global Layout</h4>
+            <ul>
+              <li>Header</li>
+              <li>Navigation</li>
+              <li>Language toggle</li>
+              <li>Theme toggle</li>
+              <li>Main content area</li>
+              <li>Footer with social/contact information</li>
+            </ul>
+
+            <h4>Public Pages</h4>
+            <ul>
+              <li>Home</li>
+              <li>About</li>
+              <li>Experience</li>
+              <li>Blog list</li>
+              <li>Blog detail</li>
+            </ul>
+
+            <h4>Public UI Requirements</h4>
+            <ul>
+              <li>Clean professional presentation</li>
+              <li>Strong readability</li>
+              <li>Responsive layout</li>
+              <li>Accessible navigation</li>
+              <li>Good dark mode behavior</li>
+              <li>Localized text and content fallback</li>
+            </ul>
+
+            <h3>13.2 Admin UI</h3>
+
+            <h4>Global Layout</h4>
+            <ul>
+              <li>Sidebar/top navigation</li>
+              <li>Authenticated route shell</li>
+              <li>Dashboard home</li>
+              <li>Section-based content editors</li>
+              <li>Media management area</li>
+              <li>Settings area</li>
+            </ul>
+
+            <h4>Admin UI Requirements</h4>
+            <ul>
+              <li>Clear form-driven editing</li>
+              <li>Localized input sections</li>
+              <li>Markdown editor with rich editing experience</li>
+              <li>Upload selection and preview</li>
+              <li>Draft/publish controls</li>
+              <li>Validation feedback</li>
+              <li>Session-expiry handling</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-14">
+            <h2>14. Workflows</h2>
+
+            <h3>14.1 Initial Admin Bootstrap</h3>
+            <ol>
+              <li>System starts with no admin user.</li>
+              <li>Bootstrap mechanism is enabled.</li>
+              <li>Initial admin account is created once.</li>
+              <li>Bootstrap mechanism is disabled after first admin exists.</li>
+            </ol>
+
+            <h3>14.2 Admin Login</h3>
+            <ol>
+              <li>Admin submits credentials.</li>
+              <li>Backend validates credentials.</li>
+              <li>Backend returns access token and sets refresh cookie.</li>
+              <li>Frontend stores access token in memory.</li>
+              <li>Admin session becomes active.</li>
+            </ol>
+
+            <h3>14.3 Session Refresh</h3>
+            <ol>
+              <li>Access token expires.</li>
+              <li>Frontend calls refresh endpoint.</li>
+              <li>Backend validates refresh cookie/session.</li>
+              <li>Backend issues new access token.</li>
+              <li>Frontend updates in-memory token.</li>
+            </ol>
+
+            <h3>14.4 Public Content Retrieval</h3>
+            <ol>
+              <li>User opens a public page.</li>
+              <li>Frontend requests localized content from public API.</li>
+              <li>Backend resolves requested locale.</li>
+              <li>If localized content is missing, English fallback is returned or applied.</li>
+              <li>Frontend renders page.</li>
+            </ol>
+
+            <h3>14.5 Blog Publishing</h3>
+            <ol>
+              <li>Admin creates or edits post.</li>
+              <li>Admin writes Markdown content through rich editor UI.</li>
+              <li>Admin sets category, tags, featured image, and SEO fields.</li>
+              <li>Admin saves as draft or publishes.</li>
+              <li>Published posts become visible through public APIs.</li>
+            </ol>
+
+            <h3>14.6 File Upload</h3>
+            <ol>
+              <li>Admin uploads image or document.</li>
+              <li>Backend validates file type and size.</li>
+              <li>File is stored locally.</li>
+              <li>Media metadata is stored in database.</li>
+              <li>Media becomes available for content association.</li>
+            </ol>
+          </section>
+
+          <hr />
+
+          <section id="section-15">
+            <h2>15. Permissions Matrix</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Public Visitor</th>
+                  <th>Admin</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>View published home/about/experience/blog</td>
+                  <td>Yes</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>View draft content</td>
+                  <td>No</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>Login to admin</td>
+                  <td>No</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>Manage content</td>
+                  <td>No</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>Manage blog</td>
+                  <td>No</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>Manage uploads</td>
+                  <td>No</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>Manage settings</td>
+                  <td>No</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>Access dashboard</td>
+                  <td>No</td>
+                  <td>Yes</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <hr />
+
+          <section id="section-16">
+            <h2>16. Architecture</h2>
+
+            <h3>16.1 Frontend Architecture</h3>
+            <p>Recommended structure:</p>
+            <ul>
+              <li>
+                <code>src/features/</code>
+                <ul>
+                  <li>auth</li>
+                  <li>blog</li>
+                  <li>projects (admin CMS module; no standalone public Projects page in V1)</li>
+                  <li>settings</li>
+                  <li>uploads</li>
+                </ul>
+              </li>
+            </ul>
+
+            <h4>Frontend Provider Order</h4>
+            <ol>
+              <li>Query provider</li>
+              <li>Theme provider</li>
+              <li>Locale provider</li>
+              <li>Auth provider</li>
+              <li>Router provider</li>
+            </ol>
+
+            <h3>16.2 Backend Architecture</h3>
+            <p>Recommended structure:</p>
+            <ul>
+              <li><code>src/config/</code></li>
+              <li><code>src/routes/v1/</code></li>
+              <li><code>src/controllers/</code></li>
+              <li><code>src/services/</code></li>
+              <li><code>src/middleware/</code></li>
+              <li><code>src/validators/</code></li>
+              <li><code>src/utils/</code></li>
+              <li><code>src/types/</code></li>
+              <li><code>src/i18n/</code></li>
+              <li><code>prisma/</code></li>
+              <li><code>tests/</code></li>
+            </ul>
+
+            <h4>Backend Layering</h4>
+            <ul>
+              <li><strong>Routes</strong>: endpoint mapping only</li>
+              <li><strong>Controllers</strong>: request/response orchestration</li>
+              <li><strong>Services</strong>: business logic</li>
+              <li><strong>Validators</strong>: request validation rules</li>
+              <li><strong>Middleware</strong>: auth, locale, errors, request validation</li>
+              <li><strong>Utilities</strong>: shared helpers</li>
+              <li><strong>Prisma layer</strong>: persistence access</li>
+            </ul>
+
+            <h3>16.3 Data Strategy</h3>
+            <ul>
+              <li>SQLite for local development and tests</li>
+              <li>PostgreSQL for production</li>
+              <li>Prisma migrations for schema evolution</li>
+              <li>Modular content tables with translation tables</li>
+              <li>Storage abstraction for future migration from local files to cloud storage</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-17">
+            <h2>17. Testing Requirements</h2>
+
+            <h3>Frontend</h3>
+            <p>Must include unit/component tests for:</p>
+            <ul>
+              <li>Provider rendering</li>
+              <li>Auth state handling</li>
+              <li>Protected route behavior</li>
+              <li>Theme toggle</li>
+              <li>Language toggle</li>
+              <li>Public page rendering</li>
+              <li>Admin form validation</li>
+              <li>Query/data state handling where practical</li>
+            </ul>
+
+            <h3>Backend</h3>
+            <p>Must include:</p>
+
+            <h4>Unit Tests</h4>
+            <ul>
+              <li>auth service</li>
+              <li>token service</li>
+              <li>validation helpers</li>
+              <li>locale resolution</li>
+              <li>utility functions</li>
+            </ul>
+
+            <h4>Integration Tests</h4>
+            <ul>
+              <li>login flow</li>
+              <li>refresh flow</li>
+              <li>auth verification</li>
+              <li>protected route access</li>
+              <li>content CRUD where practical</li>
+              <li>public content retrieval</li>
+              <li>blog search/filter behavior</li>
+              <li>upload endpoint validation</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-18">
+            <h2>18. Implementation Milestones</h2>
+
+            <h3>Milestone 1: Foundation</h3>
+            <ul>
+              <li>Repository structure</li>
+              <li>Frontend and backend bootstrapping</li>
+              <li>Shared architecture conventions</li>
+              <li>Environment configuration</li>
+              <li>Database setup</li>
+              <li>Prisma base schema</li>
+              <li>API versioning</li>
+              <li>ESLint/testing setup</li>
+            </ul>
+
+            <h3>Milestone 2: Authentication</h3>
+            <ul>
+              <li>Bootstrap admin creation</li>
+              <li>Login/logout/refresh/me/verify</li>
+              <li>Access token and refresh cookie flow</li>
+              <li>Protected admin routing</li>
+              <li>Session handling</li>
+            </ul>
+
+            <h3>Milestone 3: Core CMS</h3>
+            <ul>
+              <li>Site settings</li>
+              <li>Home content</li>
+              <li>About content</li>
+              <li>Experience content</li>
+              <li>Skills content</li>
+              <li>Shared localized content model</li>
+            </ul>
+
+            <h3>Milestone 4: Projects</h3>
+            <ul>
+              <li>Admin project CRUD</li>
+              <li>Category/technology support</li>
+              <li>Featured project support</li>
+              <li>Project content reuse in Home and Experience sections</li>
+            </ul>
+
+            <h3>Milestone 5: Blog</h3>
+            <ul>
+              <li>Blog CRUD</li>
+              <li>Draft/published workflow</li>
+              <li>Category and tag support</li>
+              <li>Slugs</li>
+              <li>Markdown content</li>
+              <li>Rich editor UI</li>
+              <li>Reading time</li>
+              <li>SEO metadata</li>
+              <li>Related posts</li>
+              <li>Public blog pages</li>
+              <li>Simple search</li>
+            </ul>
+
+            <h3>Milestone 6: Uploads</h3>
+            <ul>
+              <li>Local file upload support</li>
+              <li>Media library basics</li>
+              <li>Attach media to content</li>
+            </ul>
+
+            <h3>Milestone 7: Localization and Theme</h3>
+            <ul>
+              <li>Public + admin UI localization</li>
+              <li>CMS localized content editing</li>
+              <li>English fallback behavior</li>
+              <li>Theme persistence and system default</li>
+            </ul>
+
+            <h3>Milestone 8: Quality and Hardening</h3>
+            <ul>
+              <li>Accessibility improvements</li>
+              <li>Performance optimization</li>
+              <li>SEO assets</li>
+              <li>Test coverage refinement</li>
+              <li>Error handling polish</li>
+              <li>Security review</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-19">
+            <h2>19. Acceptance Criteria Summary</h2>
+            <p>The project is acceptable for V1 when:</p>
+            <ul>
+              <li>Admin authentication works with access token + refresh cookie</li>
+              <li>Bootstrap-only admin creation is enforced</li>
+              <li>Public pages render backend-driven content</li>
+              <li>All major content modules are manageable in admin</li>
+              <li>Blog supports draft/published, slug, categories, tags, Markdown, SEO</li>
+              <li>Images and documents can be uploaded and referenced</li>
+              <li>English and Myanmar are supported across UI and CMS content</li>
+              <li>Myanmar content falls back to English when missing</li>
+              <li>Theme toggle supports system/light/dark</li>
+              <li>Public APIs are versioned under <code>/api/v1</code></li>
+              <li>Admin APIs are protected</li>
+              <li>Unit tests exist for both frontend and backend</li>
+              <li>Integration tests exist for key backend flows</li>
+              <li>The architecture remains modular and extensible</li>
+            </ul>
+          </section>
+
+          <hr />
+
+          <section id="section-20">
+            <h2>20. Future Considerations</h2>
+            <p>Possible V2+ additions:</p>
+            <ul>
+              <li>Multi-admin support</li>
+              <li>Role-based permissions</li>
+              <li>Contact form with spam protection</li>
+              <li>Email notifications</li>
+              <li>End-to-end tests</li>
+              <li>Cloud file storage</li>
+              <li>Analytics integration</li>
+              <li>Commenting or subscriptions</li>
+              <li>Richer SEO automation</li>
+              <li>Content revision history</li>
+              <li>Scheduled publishing</li>
+              <li>Dashboard analytics</li>
+            </ul>
+          </section>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

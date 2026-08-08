@@ -1,0 +1,45 @@
+{
+  "brand": {
+    "title": "Personal Website Platform"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "experience": "Experience",
+    "blog": "Blog"
+  },
+  "footer": {
+    "tagline": "Content-driven public site and admin portal.",
+    "admin": "Admin portal"
+  },
+  "states": {
+    "loading": "Loading",
+    "loadingContent": "Fetching the latest content from the API.",
+    "error": "Something went wrong",
+    "errorContent": "The page data could not be loaded from the backend."
+  },
+  "home": {
+    "eyebrow": "Public website",
+    "fallbackTitle": "A modular website platform driven by backend content.",
+    "fallbackSubtitle": "Public content, blog entries, and admin editing are designed to stay synchronized.",
+    "fallbackIntro": "The public portal is rendered from backend-managed CMS content with locale fallback.",
+    "skillsTitle": "Tech Stack",
+    "skillsOverview": "The frontend uses API data for public sections instead of hardcoded text.",
+    "featuredProjects": "Featured projects",
+    "latestPosts": "Latest posts"
+  },
+  "about": {
+    "title": "About",
+    "timelineTitle": "Career timeline"
+  },
+  "experience": {
+    "title": "Experience",
+    "skillsTitle": "Skills overview"
+  },
+  "blog": {
+    "title": "Writing",
+    "description": "Published Markdown posts with search and related content.",
+    "searchPlaceholder": "Search posts by title or content",
+    "relatedPosts": "Related posts"
+  }
+}
