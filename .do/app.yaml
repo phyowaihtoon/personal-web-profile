@@ -5,7 +5,7 @@ services:
   - name: api
     github:
       repo: phyowaihtoon/personal-web-profile
-      branch: master
+      branch: main
       deploy_on_push: true
     source_dir: backend-app
     environment_slug: node-js
@@ -52,7 +52,7 @@ static_sites:
   - name: web
     github:
       repo: phyowaihtoon/personal-web-profile
-      branch: master
+      branch: main
       deploy_on_push: true
     source_dir: frontend-app
     build_command: npm ci && npm run build
