@@ -1,6 +1,14 @@
 name: personal-web-profile
 region: sgp
 
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    production: true
+    size: db-s-1vcpu-1gb
+    num_nodes: 1
+
 services:
   - name: api
     github:
@@ -16,6 +24,7 @@ services:
     run_command: npm run start
     routes:
       - path: /api
+      - path: /uploads
     health_check:
       http_path: /api/v1/health
       initial_delay_seconds: 15
@@ -34,7 +43,8 @@ services:
         value: https://your-app.ondigitalocean.app
         scope: RUN_TIME
       - key: DATABASE_URL
-        value: file:./prisma/dev.db
+        value: ${db.DATABASE_URL}
+        type: SECRET
         scope: RUN_AND_BUILD_TIME
       - key: JWT_ACCESS_SECRET
         value: REPLACE_WITH_LONG_SECRET
@@ -46,6 +56,12 @@ services:
         scope: RUN_TIME
       - key: COOKIE_SECURE
         value: "true"
+        scope: RUN_TIME
+      - key: UPLOAD_DIR
+        value: uploads
+        scope: RUN_TIME
+      - key: UPLOAD_STORAGE
+        value: local
         scope: RUN_TIME
 
 static_sites:

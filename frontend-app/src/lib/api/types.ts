@@ -26,6 +26,7 @@ export type HomePageData = {
   }
   featuredProjects: Project[]
   latestPosts: BlogPostSummary[]
+  homepageSectionVisibility?: Record<string, boolean>
 }
 
 export type AboutPageData = {

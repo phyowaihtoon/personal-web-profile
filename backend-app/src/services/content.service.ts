@@ -1,5 +1,4 @@
 import fs from 'node:fs'
-import path from 'node:path'
 
 import type { Prisma } from '@prisma/client'
 
@@ -10,6 +9,7 @@ import { AppError } from '../utils/app-error'
 import { asArray, asRecord } from '../utils/json'
 import { resolveLocalizedObject } from '../utils/locale'
 import { calculateReadingTimeMinutes } from '../utils/reading-time'
+import { deleteUploadedFile, saveUploadedFile } from './upload-storage.service'
 
 function translationRecord(value: Prisma.JsonValue | null | undefined) {
   return asRecord(value) as Record<'en' | 'my', Record<string, unknown>>
@@ -692,17 +692,21 @@ export const contentService = {
 
     const maxBytes = env.MAX_UPLOAD_SIZE_MB * 1024 * 1024
     if (file.size > maxBytes) {
-      fs.rmSync(file.path, { force: true })
+      if (typeof file.path === 'string' && file.path.length > 0) {
+        fs.rmSync(file.path, { force: true })
+      }
       throw new AppError(400, 'UPLOAD_TOO_LARGE', 'The uploaded file exceeds the configured size limit.')
     }
+
+    const saved = await saveUploadedFile(file)
 
     return prisma.mediaFile.create({
       data: {
         originalName: file.originalname,
-        storedName: path.basename(file.filename),
+        storedName: saved.storedName,
         mimeType: file.mimetype,
         size: file.size,
-        path: `/uploads/${path.basename(file.filename)}`,
+        path: saved.publicPath,
         kind: file.mimetype.startsWith('image/') ? 'image' : 'document',
         uploadedById: uploadedById ?? null,
       },
@@ -716,8 +720,7 @@ export const contentService = {
       throw new AppError(404, 'NOT_FOUND', 'The requested upload does not exist.')
     }
 
-    const absolutePath = path.resolve(env.uploadDirAbsolute, path.basename(upload.storedName))
-    fs.rmSync(absolutePath, { force: true })
+    await deleteUploadedFile(upload)
     await prisma.mediaFile.delete({ where: { id } })
   },
 }

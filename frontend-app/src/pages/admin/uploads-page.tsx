@@ -76,31 +76,41 @@ export function UploadsPage() {
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {uploadsQuery.data.map((upload) => (
-          <Card key={String(upload.id)} className="bg-[var(--surface-strong)]">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent)]">{String(upload.kind ?? 'file')}</p>
-            <h2 className="mt-3 text-xl font-semibold">{String(upload.originalName ?? upload.storedName ?? upload.id)}</h2>
-            <p className="mt-2 text-sm text-[var(--muted)]">{String(upload.path ?? '')}</p>
-            <div className="mt-4 flex gap-3">
-              <a href={`http://localhost:4000${String(upload.path ?? '')}`} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[var(--accent)]">
-                Open file
-              </a>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={async () => {
-                  try {
-                    await deleteMutation.mutateAsync(String(upload.id))
-                  } catch (error) {
-                    setErrorMessage(error instanceof Error ? error.message : 'Unable to delete the selected file.')
-                  }
-                }}
-              >
-                Delete
-              </Button>
-            </div>
-          </Card>
-        ))}
+        {uploadsQuery.data.map((upload) => {
+          const uploadPath = String(upload.path ?? '')
+          const openHref =
+            uploadPath.startsWith('http://') || uploadPath.startsWith('https://')
+              ? uploadPath
+              : uploadPath.startsWith('/')
+                ? uploadPath
+                : `/${uploadPath}`
+
+          return (
+            <Card key={String(upload.id)} className="bg-[var(--surface-strong)]">
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent)]">{String(upload.kind ?? 'file')}</p>
+              <h2 className="mt-3 text-xl font-semibold">{String(upload.originalName ?? upload.storedName ?? upload.id)}</h2>
+              <p className="mt-2 text-sm text-[var(--muted)]">{String(upload.path ?? '')}</p>
+              <div className="mt-4 flex gap-3">
+                <a href={openHref} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[var(--accent)]">
+                  Open file
+                </a>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={async () => {
+                    try {
+                      await deleteMutation.mutateAsync(String(upload.id))
+                    } catch (error) {
+                      setErrorMessage(error instanceof Error ? error.message : 'Unable to delete the selected file.')
+                    }
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </Card>
+          )
+        })}
       </div>
     </div>
   )
