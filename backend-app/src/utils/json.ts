@@ -1,6 +1,7 @@
-import type { Prisma } from '@prisma/client'
+export type JsonValue = any
+export type InputJsonValue = any
 
-export function asRecord(value: Prisma.JsonValue | null | undefined): Record<string, unknown> {
+export function asRecord(value: JsonValue | null | undefined): Record<string, unknown> {
   if (!value || Array.isArray(value) || typeof value !== 'object') {
     return {}
   }
@@ -8,6 +9,6 @@ export function asRecord(value: Prisma.JsonValue | null | undefined): Record<str
   return value as Record<string, unknown>
 }
 
-export function asArray<T>(value: Prisma.JsonValue | null | undefined): T[] {
+export function asArray<T>(value: JsonValue | null | undefined): T[] {
   return Array.isArray(value) ? (value as T[]) : []
 }

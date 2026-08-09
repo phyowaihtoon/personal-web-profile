@@ -1,24 +1,22 @@
-import fs from 'node:fs'
-
-import type { Prisma } from '@prisma/client'
+﻿import fs from 'node:fs'
 
 import { env } from '../config/env'
 import { prisma } from '../config/prisma'
 import type { Locale } from '../types'
 import { AppError } from '../utils/app-error'
-import { asArray, asRecord } from '../utils/json'
+import { asArray, asRecord, type InputJsonValue, type JsonValue } from '../utils/json'
 import { resolveLocalizedObject } from '../utils/locale'
 import { calculateReadingTimeMinutes } from '../utils/reading-time'
 import { deleteUploadedFile, saveUploadedFile } from './upload-storage.service'
 
-function translationRecord(value: Prisma.JsonValue | null | undefined) {
+function translationRecord(value: JsonValue | null | undefined) {
   return asRecord(value) as Record<'en' | 'my', Record<string, unknown>>
 }
 
-function resolveTextRecord(value: Prisma.JsonValue | null | undefined, locale: Locale) {
+function resolveTextRecord(value: JsonValue | null | undefined, locale: Locale) {
   const translations = translationRecord(value)
-  const fallback = asRecord(translations.en as Prisma.JsonValue | null | undefined)
-  const localized = asRecord(translations[locale] as Prisma.JsonValue | null | undefined)
+  const fallback = asRecord(translations.en as JsonValue | null | undefined)
+  const localized = asRecord(translations[locale] as JsonValue | null | undefined)
   return {
     ...fallback,
     ...localized,
@@ -26,9 +24,9 @@ function resolveTextRecord(value: Prisma.JsonValue | null | undefined, locale: L
 }
 
 function resolveNestedLocalizedText(value: unknown, locale: Locale, key: string) {
-  const localizedSource = asRecord(value as Prisma.JsonValue | null | undefined)
-  const localized = asRecord(localizedSource[locale] as Prisma.JsonValue | null | undefined)
-  const fallback = asRecord(localizedSource.en as Prisma.JsonValue | null | undefined)
+  const localizedSource = asRecord(value as JsonValue | null | undefined)
+  const localized = asRecord(localizedSource[locale] as JsonValue | null | undefined)
+  const fallback = asRecord(localizedSource.en as JsonValue | null | undefined)
   const resolved = localized[key] ?? fallback[key]
   return typeof resolved === 'string' ? resolved : ''
 }
@@ -41,8 +39,8 @@ function serializeExperienceItem(item: {
   isCurrent: boolean
   sortOrder: number
   isVisible: boolean
-  translations: Prisma.JsonValue | null
-  technologies: Prisma.JsonValue | null
+  translations: JsonValue | null
+  technologies: JsonValue | null
 }) {
   return (locale: Locale) => {
     const localized = resolveTextRecord(item.translations, locale)
@@ -68,7 +66,7 @@ function serializeSkill(item: {
   categoryKey: string
   sortOrder: number
   isVisible: boolean
-  translations: Prisma.JsonValue | null
+  translations: JsonValue | null
 }) {
   return (locale: Locale) => {
     const localized = resolveTextRecord(item.translations, locale)
@@ -93,9 +91,9 @@ function serializeProject(item: {
   isPublished: boolean
   publishedAt: Date | null
   sortOrder: number
-  translations: Prisma.JsonValue | null
-  categories: Prisma.JsonValue | null
-  technologies: Prisma.JsonValue | null
+  translations: JsonValue | null
+  categories: JsonValue | null
+  technologies: JsonValue | null
 }) {
   return (locale: Locale) => {
     const localized = resolveTextRecord(item.translations, locale)
@@ -124,9 +122,9 @@ function serializeBlogPost(item: {
   featuredImageMediaId: string | null
   readingTimeMinutes: number
   publishedAt: Date | null
-  translations: Prisma.JsonValue | null
-  categoryIds: Prisma.JsonValue | null
-  tagIds: Prisma.JsonValue | null
+  translations: JsonValue | null
+  categoryIds: JsonValue | null
+  tagIds: JsonValue | null
 }) {
   return (locale: Locale) => {
     const localized = resolveTextRecord(item.translations, locale)
@@ -148,7 +146,7 @@ function serializeBlogPost(item: {
   }
 }
 
-function resolveTimeline(careerTimeline: Prisma.JsonValue | null, locale: Locale) {
+function resolveTimeline(careerTimeline: JsonValue | null, locale: Locale) {
   return asArray<Record<string, unknown>>(careerTimeline).map((item) => ({
     startDate: String(item.startDate ?? ''),
     endDate: item.endDate ? String(item.endDate) : null,
@@ -358,15 +356,15 @@ export const contentService = {
       update: {
         featuredProjectLimit: Number(data.featuredProjectLimit ?? 3),
         latestBlogLimit: Number(data.latestBlogLimit ?? 3),
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        sectionVisibility: data.sectionVisibility as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
+        sectionVisibility: data.sectionVisibility as InputJsonValue | undefined,
       },
       create: {
         id: 'home-page',
         featuredProjectLimit: Number(data.featuredProjectLimit ?? 3),
         latestBlogLimit: Number(data.latestBlogLimit ?? 3),
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        sectionVisibility: data.sectionVisibility as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
+        sectionVisibility: data.sectionVisibility as InputJsonValue | undefined,
       },
     })
   },
@@ -381,14 +379,14 @@ export const contentService = {
       where: { id: 'about-page' },
       update: {
         profileMediaId: typeof data.profileMediaId === 'string' ? data.profileMediaId : null,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        careerTimeline: data.careerTimeline as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
+        careerTimeline: data.careerTimeline as InputJsonValue | undefined,
       },
       create: {
         id: 'about-page',
         profileMediaId: typeof data.profileMediaId === 'string' ? data.profileMediaId : null,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        careerTimeline: data.careerTimeline as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
+        careerTimeline: data.careerTimeline as InputJsonValue | undefined,
       },
     })
   },
@@ -407,9 +405,9 @@ export const contentService = {
         isCurrent: Boolean(data.isCurrent),
         sortOrder: Number(data.sortOrder ?? 0),
         isVisible: data.isVisible !== false,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        technologies: (data.technologies ?? []) as Prisma.InputJsonValue,
-        featuredProjectIds: (data.featuredProjectIds ?? []) as Prisma.InputJsonValue,
+        translations: data.translations as InputJsonValue | undefined,
+        technologies: (data.technologies ?? []) as InputJsonValue,
+        featuredProjectIds: (data.featuredProjectIds ?? []) as InputJsonValue,
       },
     })
   },
@@ -429,9 +427,9 @@ export const contentService = {
         isCurrent: typeof data.isCurrent === 'boolean' ? data.isCurrent : undefined,
         sortOrder: typeof data.sortOrder === 'number' ? data.sortOrder : undefined,
         isVisible: typeof data.isVisible === 'boolean' ? data.isVisible : undefined,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        technologies: data.technologies as Prisma.InputJsonValue | undefined,
-        featuredProjectIds: data.featuredProjectIds as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
+        technologies: data.technologies as InputJsonValue | undefined,
+        featuredProjectIds: data.featuredProjectIds as InputJsonValue | undefined,
       },
     })
   },
@@ -452,7 +450,7 @@ export const contentService = {
         categoryKey: String(data.categoryKey ?? 'general'),
         sortOrder: Number(data.sortOrder ?? 0),
         isVisible: data.isVisible !== false,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
       },
     })
   },
@@ -470,7 +468,7 @@ export const contentService = {
         categoryKey: typeof data.categoryKey === 'string' ? data.categoryKey : undefined,
         sortOrder: typeof data.sortOrder === 'number' ? data.sortOrder : undefined,
         isVisible: typeof data.isVisible === 'boolean' ? data.isVisible : undefined,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
       },
     })
   },
@@ -494,10 +492,10 @@ export const contentService = {
         isPublished: Boolean(data.isPublished),
         publishedAt: maybePublishedAt(data.isPublished ? 'published' : 'draft', data.publishedAt),
         sortOrder: Number(data.sortOrder ?? 0),
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        categories: (data.categories ?? []) as Prisma.InputJsonValue,
-        technologies: (data.technologies ?? []) as Prisma.InputJsonValue,
-        galleryMediaIds: (data.galleryMediaIds ?? []) as Prisma.InputJsonValue,
+        translations: data.translations as InputJsonValue | undefined,
+        categories: (data.categories ?? []) as InputJsonValue,
+        technologies: (data.technologies ?? []) as InputJsonValue,
+        galleryMediaIds: (data.galleryMediaIds ?? []) as InputJsonValue,
       },
     })
   },
@@ -518,10 +516,10 @@ export const contentService = {
         isPublished: typeof data.isPublished === 'boolean' ? data.isPublished : undefined,
         publishedAt: data.isPublished !== undefined || data.publishedAt ? maybePublishedAt(data.isPublished ? 'published' : 'draft', data.publishedAt) : undefined,
         sortOrder: typeof data.sortOrder === 'number' ? data.sortOrder : undefined,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        categories: data.categories as Prisma.InputJsonValue | undefined,
-        technologies: data.technologies as Prisma.InputJsonValue | undefined,
-        galleryMediaIds: data.galleryMediaIds as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
+        categories: data.categories as InputJsonValue | undefined,
+        technologies: data.technologies as InputJsonValue | undefined,
+        galleryMediaIds: data.galleryMediaIds as InputJsonValue | undefined,
       },
     })
   },
@@ -537,7 +535,7 @@ export const contentService = {
   createBlogPostAdmin(body: unknown) {
     const data = assertRecord(body, 'Blog post payload must be an object.')
     const translations = (data.translations ?? {}) as Record<string, Record<string, unknown>>
-    const englishContent = asRecord(translations.en as Prisma.JsonValue | null | undefined).contentMarkdown
+    const englishContent = asRecord(translations.en as JsonValue | null | undefined).contentMarkdown
     const readingTimeMinutes = calculateReadingTimeMinutes(typeof englishContent === 'string' ? englishContent : undefined)
 
     return prisma.blogPost.create({
@@ -547,9 +545,9 @@ export const contentService = {
         featuredImageMediaId: typeof data.featuredImageMediaId === 'string' ? data.featuredImageMediaId : null,
         readingTimeMinutes,
         publishedAt: maybePublishedAt(data.status, data.publishedAt),
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        categoryIds: (data.categoryIds ?? []) as Prisma.InputJsonValue,
-        tagIds: (data.tagIds ?? []) as Prisma.InputJsonValue,
+        translations: data.translations as InputJsonValue | undefined,
+        categoryIds: (data.categoryIds ?? []) as InputJsonValue,
+        tagIds: (data.tagIds ?? []) as InputJsonValue,
       },
     })
   },
@@ -562,7 +560,7 @@ export const contentService = {
     const data = assertRecord(body, 'Blog post payload must be an object.')
     const translations = data.translations ? (data.translations as Record<string, Record<string, unknown>>) : undefined
     const englishContent = translations
-      ? asRecord(translations.en as Prisma.JsonValue | null | undefined).contentMarkdown
+      ? asRecord(translations.en as JsonValue | null | undefined).contentMarkdown
       : undefined
     const readingTimeMinutes =
       typeof englishContent === 'string' ? calculateReadingTimeMinutes(englishContent) : undefined
@@ -575,9 +573,9 @@ export const contentService = {
         featuredImageMediaId: typeof data.featuredImageMediaId === 'string' ? data.featuredImageMediaId : null,
         readingTimeMinutes,
         publishedAt: data.status || data.publishedAt ? maybePublishedAt(data.status, data.publishedAt) : undefined,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
-        categoryIds: data.categoryIds as Prisma.InputJsonValue | undefined,
-        tagIds: data.tagIds as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
+        categoryIds: data.categoryIds as InputJsonValue | undefined,
+        tagIds: data.tagIds as InputJsonValue | undefined,
       },
     })
   },
@@ -595,7 +593,7 @@ export const contentService = {
     return prisma.blogCategory.create({
       data: {
         slug: String(data.slug ?? ''),
-        translations: data.translations as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
       },
     })
   },
@@ -606,7 +604,7 @@ export const contentService = {
       where: { id },
       data: {
         slug: typeof data.slug === 'string' ? data.slug : undefined,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
       },
     })
   },
@@ -624,7 +622,7 @@ export const contentService = {
     return prisma.blogTag.create({
       data: {
         slug: String(data.slug ?? ''),
-        translations: data.translations as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
       },
     })
   },
@@ -635,7 +633,7 @@ export const contentService = {
       where: { id },
       data: {
         slug: typeof data.slug === 'string' ? data.slug : undefined,
-        translations: data.translations as Prisma.InputJsonValue | undefined,
+        translations: data.translations as InputJsonValue | undefined,
       },
     })
   },
@@ -654,29 +652,29 @@ export const contentService = {
     return prisma.siteSetting.upsert({
       where: { id: 'site-settings' },
       update: {
-        siteTitle: data.siteTitle as Prisma.InputJsonValue | undefined,
+        siteTitle: data.siteTitle as InputJsonValue | undefined,
         defaultLocale: typeof data.defaultLocale === 'string' ? data.defaultLocale : undefined,
-        seoDefaultTitle: data.seoDefaultTitle as Prisma.InputJsonValue | undefined,
-        seoDefaultDescription: data.seoDefaultDescription as Prisma.InputJsonValue | undefined,
+        seoDefaultTitle: data.seoDefaultTitle as InputJsonValue | undefined,
+        seoDefaultDescription: data.seoDefaultDescription as InputJsonValue | undefined,
         logoMediaId: typeof data.logoMediaId === 'string' ? data.logoMediaId : null,
         faviconMediaId: typeof data.faviconMediaId === 'string' ? data.faviconMediaId : null,
-        socialLinks: data.socialLinks as Prisma.InputJsonValue | undefined,
-        contactInfo: data.contactInfo as Prisma.InputJsonValue | undefined,
-        analyticsScriptIds: data.analyticsScriptIds as Prisma.InputJsonValue | undefined,
-        homepageSectionVisibility: data.homepageSectionVisibility as Prisma.InputJsonValue | undefined,
+        socialLinks: data.socialLinks as InputJsonValue | undefined,
+        contactInfo: data.contactInfo as InputJsonValue | undefined,
+        analyticsScriptIds: data.analyticsScriptIds as InputJsonValue | undefined,
+        homepageSectionVisibility: data.homepageSectionVisibility as InputJsonValue | undefined,
       },
       create: {
         id: 'site-settings',
         defaultLocale: typeof data.defaultLocale === 'string' ? data.defaultLocale : env.APP_LOCALE_DEFAULT,
-        siteTitle: data.siteTitle as Prisma.InputJsonValue | undefined,
-        seoDefaultTitle: data.seoDefaultTitle as Prisma.InputJsonValue | undefined,
-        seoDefaultDescription: data.seoDefaultDescription as Prisma.InputJsonValue | undefined,
+        siteTitle: data.siteTitle as InputJsonValue | undefined,
+        seoDefaultTitle: data.seoDefaultTitle as InputJsonValue | undefined,
+        seoDefaultDescription: data.seoDefaultDescription as InputJsonValue | undefined,
         logoMediaId: typeof data.logoMediaId === 'string' ? data.logoMediaId : null,
         faviconMediaId: typeof data.faviconMediaId === 'string' ? data.faviconMediaId : null,
-        socialLinks: data.socialLinks as Prisma.InputJsonValue | undefined,
-        contactInfo: data.contactInfo as Prisma.InputJsonValue | undefined,
-        analyticsScriptIds: data.analyticsScriptIds as Prisma.InputJsonValue | undefined,
-        homepageSectionVisibility: data.homepageSectionVisibility as Prisma.InputJsonValue | undefined,
+        socialLinks: data.socialLinks as InputJsonValue | undefined,
+        contactInfo: data.contactInfo as InputJsonValue | undefined,
+        analyticsScriptIds: data.analyticsScriptIds as InputJsonValue | undefined,
+        homepageSectionVisibility: data.homepageSectionVisibility as InputJsonValue | undefined,
       },
     })
   },
