@@ -215,8 +215,8 @@ export const contentService = {
 
     return {
       hero: resolveTextRecord(homePage.translations, locale),
-      featuredProjects: projects.map((project) => serializeProject(project)(locale)),
-      latestPosts: posts.map((post) => serializeBlogPost(post)(locale)),
+      featuredProjects: projects.map((project: Awaited<typeof projects>[number]) => serializeProject(project)(locale)),
+      latestPosts: posts.map((post: Awaited<typeof posts>[number]) => serializeBlogPost(post)(locale)),
       homepageSectionVisibility: asRecord(settings.homepageSectionVisibility),
     }
   },
@@ -244,7 +244,7 @@ export const contentService = {
       where: { isVisible: true },
       orderBy: { sortOrder: 'asc' },
     })
-    return items.map((item) => serializeExperienceItem(item)(locale))
+    return items.map((item: Awaited<typeof items>[number]) => serializeExperienceItem(item)(locale))
   },
 
   async getSkills(locale: Locale) {
@@ -252,7 +252,7 @@ export const contentService = {
       where: { isVisible: true },
       orderBy: [{ categoryKey: 'asc' }, { sortOrder: 'asc' }],
     })
-    return items.map((item) => serializeSkill(item)(locale))
+    return items.map((item: Awaited<typeof items>[number]) => serializeSkill(item)(locale))
   },
 
   async getBlogPosts(locale: Locale, searchQuery?: string) {
@@ -261,14 +261,14 @@ export const contentService = {
       orderBy: { publishedAt: 'desc' },
     })
 
-    const serialized = posts.map((post) => serializeBlogPost(post)(locale))
+    const serialized = posts.map((post: Awaited<typeof posts>[number]) => serializeBlogPost(post)(locale))
 
     if (!searchQuery) {
       return serialized
     }
 
     const lowered = searchQuery.toLowerCase()
-    return serialized.filter((post) =>
+    return serialized.filter((post: (typeof serialized)[number]) =>
       [post.title, post.excerpt, post.contentMarkdown].some((value) => value?.toLowerCase().includes(lowered)),
     )
   },
@@ -294,13 +294,13 @@ export const contentService = {
 
     return {
       ...serialized,
-      relatedPosts: relatedCandidates.map((item) => serializeBlogPost(item)(locale)),
+      relatedPosts: relatedCandidates.map((item: Awaited<typeof relatedCandidates>[number]) => serializeBlogPost(item)(locale)),
     }
   },
 
   async getBlogCategories(locale: Locale) {
     const items = await prisma.blogCategory.findMany({ orderBy: { slug: 'asc' } })
-    return items.map((item) => ({
+    return items.map((item: Awaited<typeof items>[number]) => ({
       id: item.id,
       slug: item.slug,
       ...resolveTextRecord(item.translations, locale),
@@ -309,7 +309,7 @@ export const contentService = {
 
   async getBlogTags(locale: Locale) {
     const items = await prisma.blogTag.findMany({ orderBy: { slug: 'asc' } })
-    return items.map((item) => ({
+    return items.map((item: Awaited<typeof items>[number]) => ({
       id: item.id,
       slug: item.slug,
       ...resolveTextRecord(item.translations, locale),
@@ -335,8 +335,8 @@ export const contentService = {
     return {
       counts: { experience, projects, skills, posts, categories, tags, uploads },
       blogStatus: { draft: draftCount, published: publishedCount },
-      recentPosts: recentPosts.map((post) => serializeBlogPost(post)('en')),
-      recentUploads: recentUploads.map((upload) => ({
+      recentPosts: recentPosts.map((post: Awaited<typeof recentPosts>[number]) => serializeBlogPost(post)('en')),
+      recentUploads: recentUploads.map((upload: Awaited<typeof recentUploads>[number]) => ({
         id: upload.id,
         originalName: upload.originalName,
         kind: upload.kind,
