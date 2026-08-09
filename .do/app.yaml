@@ -40,7 +40,7 @@ services:
         value: "4000"
         scope: RUN_TIME
       - key: CORS_ORIGIN
-        value: https://your-app.ondigitalocean.app
+        value: https://personal-web-profile.ondigitalocean.app
         scope: RUN_TIME
       - key: DATABASE_URL
         value: ${db.DATABASE_URL}
@@ -78,5 +78,5 @@ static_sites:
       - path: /
     envs:
       - key: VITE_BACKEND_API_URL
-        value: https://your-app.ondigitalocean.app/api/v1
+        value: https://personal-web-profile.ondigitalocean.app/api/v1
         scope: BUILD_TIME
