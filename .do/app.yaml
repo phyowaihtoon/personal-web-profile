@@ -77,9 +77,6 @@ static_sites:
     routes:
       - path: /
     envs:
-      - key: VITE_API_BASE_URL
-        value: /api/v1
-        scope: BUILD_TIME
-      - key: VITE_APP_URL
-        value: https://your-app.ondigitalocean.app
+      - key: VITE_BACKEND_API_URL
+        value: https://your-app.ondigitalocean.app/api/v1
         scope: BUILD_TIME

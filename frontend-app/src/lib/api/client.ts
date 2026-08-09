@@ -19,7 +19,7 @@ export class ApiError extends Error {
   }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL ?? '/api/v1'
 
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
@@ -30,7 +30,7 @@ type RequestOptions = {
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${BACKEND_API_URL}${path}`, {
     method: options.method ?? 'GET',
     credentials: 'include',
     headers: {
