@@ -36,6 +36,7 @@ The platform must support:
 - The current backend implementation stores localized resource variants in JSON fields per entity instead of separate translation tables. The API still resolves English/Myanmar content with English field-level fallback.
 - The current admin CMS implementation provides schema-driven visual form editors plus file upload management for all modules. Localized fields use English/Myanmar tabs, list fields support inline add/remove, and blog Markdown supports write/preview authoring.
 - The current frontend public shell reads site title, contact information, social links, and page content from backend APIs; navigation labels remain frontend-localized UI strings.
+- Uploads are selectable with `UPLOAD_STORAGE`: `local` disk, DigitalOcean Spaces (`s3`), or Vercel Blob (`vercel-blob`). Unset or incomplete storage configuration disables uploads without crashing boot. Cloud targets store public URLs; `local` is not used on Vercel.
 
 ---
 
@@ -120,7 +121,7 @@ The platform must support:
 - Newsletter
 - End-to-end tests
 - Multi-role admin permissions
-- Cloud media storage
+- Additional cloud storage providers beyond DigitalOcean Spaces and Vercel Blob
 - Analytics integration implementation
 - Advanced search ranking
 - Real-time editing or collaboration
@@ -429,11 +430,14 @@ Admin can upload and manage:
 - Images
 - Documents/files
 
-Storage for V1:
+Storage for V1 is selected with `UPLOAD_STORAGE`:
 
-- Local file storage
+- unset / `disabled` — API boots; new uploads are rejected until storage is configured
+- `local` — writable disk (local development / DigitalOcean App Platform; ignored on Vercel)
+- `s3` — DigitalOcean Spaces (enabled only when Spaces credentials are complete)
+- `vercel-blob` — Vercel Blob public store (enabled only when `BLOB_READ_WRITE_TOKEN` is set)
 
-The design must allow replacement with cloud storage later.
+Admin uploads still go through `POST /admin/uploads`. Cloud files are stored as public URLs so the public site can display them.
 
 ## 8.3 Admin Localization
 
@@ -510,6 +514,7 @@ Support latest stable versions of:
 - Versioned API
 - Environment-based configuration
 - Database target selection via `DATABASE_TARGET` (`onprem` for local/physical PostgreSQL, `supabase` for Supabase PostgreSQL)
+- Upload storage selection via `UPLOAD_STORAGE` (`disabled` until configured, then `local`, DigitalOcean Spaces `s3`, or `vercel-blob`)
 
 ## 9.7 Security
 

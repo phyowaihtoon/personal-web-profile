@@ -18,6 +18,7 @@ The project is intentionally kept as a single Git repository so frontend and bac
 - UI and content support English and Myanmar, with English fallback when Myanmar copy is missing.
 - Public and admin UIs use a single light editorial theme. There is no light/dark/system toggle.
 - PostgreSQL is required in every environment. `DATABASE_TARGET` selects on-prem PostgreSQL or Supabase.
+- Uploads can use local disk, DigitalOcean Spaces (`s3`), or Vercel Blob (`vercel-blob`) via `UPLOAD_STORAGE`. If storage is unset or incomplete, the API still boots and uploads stay disabled.
 - The first admin is created through a bootstrap-only flow. There is no public registration.
 
 ## Architecture
@@ -32,7 +33,7 @@ flowchart LR
   Browser[Frontend App\nReact + Vite] -->|HTTP /api/v1| API[Backend App\nExpress + TypeScript]
   API --> Prisma[Prisma Client]
   Prisma --> DB[(PostgreSQL\non-prem or Supabase)]
-  API --> Uploads[(Uploads Directory)]
+  API --> Uploads[(Local disk / Spaces / Vercel Blob)]
 ```
 
 ## Technology Stack
@@ -72,6 +73,15 @@ Required backend env values include `DATABASE_TARGET`, database URL(s) for that 
 | `supabase` | Supabase-hosted PostgreSQL | `SUPABASE_DATABASE_URL` (pooled) and `SUPABASE_DIRECT_URL` (direct/session) |
 
 Prisma schema always uses `provider = "postgresql"`. At runtime and for `npm run prisma:*` commands, the selected target is resolved into `DATABASE_URL` + `DIRECT_URL`.
+
+| `UPLOAD_STORAGE` | When to use | Required env |
+| --- | --- | --- |
+| unset / `disabled` (default) | No storage configured yet. API boots; new uploads return `503 STORAGE_NOT_CONFIGURED`. | none |
+| `local` | Local development or hosts with a writable disk (for example DigitalOcean App Platform) | `UPLOAD_DIR` (default `uploads`) |
+| `s3` | DigitalOcean Spaces | `SPACES_REGION`, `SPACES_ENDPOINT`, `SPACES_BUCKET`, `SPACES_ACCESS_KEY_ID`, `SPACES_SECRET_ACCESS_KEY` (optional `SPACES_CDN_BASE_URL`) |
+| `vercel-blob` | Vercel Blob (use a **public** store so CMS images can be displayed) | `BLOB_READ_WRITE_TOKEN` |
+
+Incomplete `s3` or `vercel-blob` credentials do not crash boot; uploads stay disabled until the required vars are set. On Vercel, `local` is treated as disabled because the function filesystem is read-only.
 
 Frontend only needs `VITE_BACKEND_API_URL` (defaults to `http://localhost:4000/api/v1`).
 
@@ -197,7 +207,8 @@ npm run build
 |   |   `-- with-database-env.ts
 |   |-- src/
 |   |   |-- config/
-|   |   |   `-- database-target.ts
+|   |   |   |-- database-target.ts
+|   |   |   `-- upload-storage.ts
 |   |   |-- controllers/
 |   |   |-- middleware/
 |   |   |-- routes/v1/
@@ -224,5 +235,5 @@ npm run build
 ## Notes
 
 - Generated artifacts (`node_modules`, `dist`, local `.env`) are ignored by Git.
-- Upload files are stored locally in development and are also ignored by Git.
+- Local upload files are stored in `UPLOAD_DIR` during development and are ignored by Git. Cloud targets store public URLs on the media record instead.
 - Full product requirements live in `PROJECT_SPEC.md`.

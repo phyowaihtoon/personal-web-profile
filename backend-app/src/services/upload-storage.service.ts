@@ -2,8 +2,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { del, put } from '@vercel/blob'
 
 import { env } from '../config/env'
+import { AppError } from '../utils/app-error'
 
 type UploadRecord = {
   storedName: string
@@ -65,6 +67,18 @@ function cleanupTempFile(file: Express.Multer.File) {
   }
 }
 
+function readFileBody(file: Express.Multer.File): Buffer {
+  if (Buffer.isBuffer(file.buffer) && file.buffer.length > 0) {
+    return file.buffer
+  }
+
+  if (typeof file.path === 'string' && file.path.length > 0) {
+    return fs.readFileSync(file.path)
+  }
+
+  throw new Error('Uploaded file body is missing.')
+}
+
 function resolveObjectKey(upload: UploadRecord) {
   if (upload.path.startsWith('http://') || upload.path.startsWith('https://')) {
     try {
@@ -85,24 +99,14 @@ function resolveObjectKey(upload: UploadRecord) {
   return getObjectKey(path.basename(upload.storedName))
 }
 
-export async function saveUploadedFile(file: Express.Multer.File): Promise<SavedUpload> {
-  const storedName = getStoredName(file)
-
-  if (env.UPLOAD_STORAGE !== 's3') {
-    return {
-      storedName,
-      publicPath: `/uploads/${storedName}`,
-    }
-  }
-
+async function saveToS3(file: Express.Multer.File, storedName: string): Promise<SavedUpload> {
   const objectKey = getObjectKey(storedName)
-  const body = typeof file.path === 'string' && file.path.length > 0 ? fs.readFileSync(file.path) : file.buffer
 
   await getS3Client().send(
     new PutObjectCommand({
       Bucket: env.SPACES_BUCKET,
       Key: objectKey,
-      Body: body,
+      Body: readFileBody(file),
       ContentType: file.mimetype,
       ACL: 'public-read',
     }),
@@ -116,19 +120,71 @@ export async function saveUploadedFile(file: Express.Multer.File): Promise<Saved
   }
 }
 
+async function saveToVercelBlob(file: Express.Multer.File, storedName: string): Promise<SavedUpload> {
+  const blob = await put(getObjectKey(storedName), readFileBody(file), {
+    access: 'public',
+    addRandomSuffix: false,
+    contentType: file.mimetype,
+    token: env.BLOB_READ_WRITE_TOKEN,
+  })
+
+  cleanupTempFile(file)
+
+  return {
+    storedName,
+    publicPath: blob.url,
+  }
+}
+
+export async function saveUploadedFile(file: Express.Multer.File): Promise<SavedUpload> {
+  const storedName = getStoredName(file)
+
+  if (env.UPLOAD_STORAGE === 'disabled') {
+    throw new AppError(
+      503,
+      'STORAGE_NOT_CONFIGURED',
+      'File uploads are disabled until UPLOAD_STORAGE is fully configured.',
+    )
+  }
+
+  if (env.UPLOAD_STORAGE === 's3') {
+    return saveToS3(file, storedName)
+  }
+
+  if (env.UPLOAD_STORAGE === 'vercel-blob') {
+    return saveToVercelBlob(file, storedName)
+  }
+
+  return {
+    storedName,
+    publicPath: `/uploads/${storedName}`,
+  }
+}
+
 export async function deleteUploadedFile(upload: UploadRecord) {
-  if (env.UPLOAD_STORAGE !== 's3') {
-    const absolutePath = path.resolve(env.uploadDirAbsolute, path.basename(upload.storedName))
-    fs.rmSync(absolutePath, { force: true })
+  if (env.UPLOAD_STORAGE === 'disabled') {
     return
   }
 
-  const key = resolveObjectKey(upload)
+  if (env.UPLOAD_STORAGE === 's3') {
+    const key = resolveObjectKey(upload)
+    await getS3Client().send(
+      new DeleteObjectCommand({
+        Bucket: env.SPACES_BUCKET,
+        Key: key,
+      }),
+    )
+    return
+  }
 
-  await getS3Client().send(
-    new DeleteObjectCommand({
-      Bucket: env.SPACES_BUCKET,
-      Key: key,
-    }),
-  )
+  if (env.UPLOAD_STORAGE === 'vercel-blob') {
+    const url = upload.path.startsWith('http://') || upload.path.startsWith('https://') ? upload.path : undefined
+    if (url) {
+      await del(url, { token: env.BLOB_READ_WRITE_TOKEN })
+    }
+    return
+  }
+
+  const absolutePath = path.resolve(env.uploadDirAbsolute, path.basename(upload.storedName))
+  fs.rmSync(absolutePath, { force: true })
 }

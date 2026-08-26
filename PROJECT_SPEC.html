@@ -338,7 +338,7 @@
               <li>Newsletter</li>
               <li>End-to-end tests</li>
               <li>Multi-role admin permissions</li>
-              <li>Cloud media storage</li>
+              <li>Additional cloud storage providers beyond DigitalOcean Spaces and Vercel Blob</li>
               <li>Analytics integration implementation</li>
               <li>Advanced search ranking</li>
               <li>Real-time editing or collaboration</li>
@@ -664,11 +664,14 @@
               <li>Images</li>
               <li>Documents/files</li>
             </ul>
-            <p>Storage for V1:</p>
+            <p>Storage for V1 is selected with <code>UPLOAD_STORAGE</code>:</p>
             <ul>
-              <li>Local file storage</li>
+              <li>unset / <code>disabled</code> — API boots; new uploads are rejected until storage is configured</li>
+              <li><code>local</code> — writable disk (local development / DigitalOcean App Platform; ignored on Vercel)</li>
+              <li><code>s3</code> — DigitalOcean Spaces (enabled only when Spaces credentials are complete)</li>
+              <li><code>vercel-blob</code> — Vercel Blob public store (enabled only when <code>BLOB_READ_WRITE_TOKEN</code> is set)</li>
             </ul>
-            <p>The design must allow replacement with cloud storage later.</p>
+            <p>Admin uploads still go through <code>POST /admin/uploads</code>. Cloud files are stored as public URLs so the public site can display them.</p>
 
             <h3>8.3 Admin Localization</h3>
             <p>Localization must apply to:</p>

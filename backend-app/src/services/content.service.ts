@@ -696,6 +696,14 @@ export const contentService = {
       throw new AppError(400, 'UPLOAD_TOO_LARGE', 'The uploaded file exceeds the configured size limit.')
     }
 
+    if (env.UPLOAD_STORAGE === 'disabled') {
+      throw new AppError(
+        503,
+        'STORAGE_NOT_CONFIGURED',
+        'File uploads are disabled until UPLOAD_STORAGE is fully configured (local, s3, or vercel-blob).',
+      )
+    }
+
     const saved = await saveUploadedFile(file)
 
     return prisma.mediaFile.create({

@@ -119,8 +119,12 @@ Use a validated env layer for:
 - `JWT_EXPIRES_IN` / access and refresh expiry settings
 - `CORS_ORIGIN`
 - `APP_LOCALE_DEFAULT`
+- `UPLOAD_STORAGE` (`disabled` | `local` | `s3` | `vercel-blob`; default `disabled`)
+- `UPLOAD_DIR` (used when `UPLOAD_STORAGE=local`)
+- Spaces credentials (used when `UPLOAD_STORAGE=s3`; incomplete values disable uploads instead of crashing)
+- `BLOB_READ_WRITE_TOKEN` (used when `UPLOAD_STORAGE=vercel-blob`; missing token disables uploads instead of crashing)
 
-Fail fast if required variables are missing for the selected database target.
+Fail fast if required variables are missing for the selected database target. Incomplete upload storage configuration must not prevent boot.
 
 Resolve Prisma connection URLs before Prisma Client or Prisma CLI commands run:
 - `onprem` → `DATABASE_URL` (and mirror as `DIRECT_URL`)

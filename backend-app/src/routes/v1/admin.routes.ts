@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 
 import { Router } from 'express'
@@ -5,17 +6,33 @@ import multer from 'multer'
 
 import { adminController } from '../../controllers/admin.controller'
 import { env } from '../../config/env'
+import { usesLocalUploadStorage } from '../../config/upload-storage'
 import { authMiddleware, requireAdmin } from '../../middleware/auth.middleware'
 
-const storage = multer.diskStorage({
-  destination: (_request, _file, callback) => callback(null, env.uploadDirAbsolute),
-  filename: (_request, file, callback) => {
-    const suffix = `${Date.now()}-${Math.round(Math.random() * 1_000_000)}`
-    callback(null, `${suffix}${path.extname(file.originalname)}`)
-  },
-})
+function createUploadMiddleware() {
+  if (!usesLocalUploadStorage(env.UPLOAD_STORAGE)) {
+    return multer({ storage: multer.memoryStorage() })
+  }
 
-const upload = multer({ storage })
+  return multer({
+    storage: multer.diskStorage({
+      destination: (_request, _file, callback) => {
+        try {
+          fs.mkdirSync(env.uploadDirAbsolute, { recursive: true })
+          callback(null, env.uploadDirAbsolute)
+        } catch (error) {
+          callback(error instanceof Error ? error : new Error('Unable to prepare the upload directory.'), '')
+        }
+      },
+      filename: (_request, file, callback) => {
+        const suffix = `${Date.now()}-${Math.round(Math.random() * 1_000_000)}`
+        callback(null, `${suffix}${path.extname(file.originalname)}`)
+      },
+    }),
+  })
+}
+
+const upload = createUploadMiddleware()
 const router = Router()
 const adminRouter = Router()
 
