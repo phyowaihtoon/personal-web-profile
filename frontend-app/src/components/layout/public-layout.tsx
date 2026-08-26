@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
+import { Menu, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { useLocale } from '../../app/providers/locale-provider'
 import { publicApi } from '../../lib/api/public'
 import { LanguageToggle } from '../locale/language-toggle'
-import { ThemeToggle } from '../theme/theme-toggle'
 
 const navItems = [
   { to: '/', key: 'home' },
@@ -14,91 +15,134 @@ const navItems = [
 ] as const
 
 export function PublicLayout() {
-  const { messages } = useLocale()
+  const { locale, messages } = useLocale()
+  const [menuOpen, setMenuOpen] = useState(false)
   const settingsQuery = useQuery({ queryKey: ['site-settings'], queryFn: publicApi.getSiteSettings })
 
   const email = settingsQuery.data?.contactInfo?.email
   const location = settingsQuery.data?.contactInfo?.location
   const socialLinks = settingsQuery.data?.socialLinks ?? []
+  const siteTitle =
+    settingsQuery.data?.siteTitle?.[locale] ?? settingsQuery.data?.siteTitle?.en ?? messages.brand.name
+
+  useEffect(() => {
+    document.title = siteTitle
+  }, [siteTitle])
 
   return (
     <div className="app-shell">
-      <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
-        <header className="glass-panel relative overflow-hidden rounded-[2rem] px-6 py-5">
-          <div className="pointer-events-none absolute -left-16 -top-12 h-44 w-44 rounded-full bg-[var(--accent-soft)] blur-3xl" />
-          <div className="pointer-events-none absolute -right-16 -bottom-14 h-52 w-52 rounded-full bg-[var(--accent-soft)] blur-3xl" />
+      <a href="#main-content" className="skip-link sr-only">
+        {messages.a11y.skipToContent}
+      </a>
 
-          <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-4 sm:gap-5">
-              <div className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--surface-strong)] p-1 shadow-sm shadow-black/5">
-                <img
-                  src="/profile-photo.jpg"
-                  alt="Phyo Wai Htoon profile"
-                  className="h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24"
-                />
-              </div>
-              <div>
-                <h1 className="display-title text-3xl text-[var(--foreground)] sm:text-4xl">Phyo Wai Htoon</h1>
-                <p className="mt-1 text-sm font-medium text-[var(--muted)]">Senior Software Engineer</p>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4 lg:items-end">
-              <nav className="flex flex-wrap gap-2">
-                {navItems.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    className={({ isActive }) =>
-                      [
-                        'rounded-full px-4 py-2 text-sm transition',
-                        isActive
-                          ? 'bg-[var(--accent)] text-white shadow-md shadow-[color:var(--ring)]'
-                          : 'bg-[var(--surface-strong)] text-[var(--foreground)] hover:bg-[var(--accent-soft)]',
-                      ].join(' ')
-                    }
-                  >
-                    {messages.nav[item.key]}
-                  </NavLink>
-                ))}
-              </nav>
-              <div className="flex flex-wrap gap-3">
-                <LanguageToggle />
-                <ThemeToggle />
-              </div>
+      <header className="site-header sticky top-0 z-40">
+        <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-4 px-4 py-6 sm:px-6 sm:py-8 md:grid-cols-[auto_minmax(0,1fr)_auto]">
+          <div className="flex min-w-0 items-center gap-4">
+            <img
+              src="/profile-photo.jpg"
+              alt={messages.home.photoAlt}
+              className="h-16 w-16 shrink-0 rounded-full object-cover ring-1 ring-white/20 sm:h-20 sm:w-20"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-lg font-bold tracking-tight text-[var(--header-fg)] sm:text-xl">{messages.brand.name}</p>
+              <p className="truncate text-sm text-[var(--header-muted)]">{messages.brand.role}</p>
             </div>
           </div>
-        </header>
 
-        <main className="flex-1 py-8">
-          <Outlet />
-        </main>
-
-        <footer className="glass-panel mt-4 rounded-[2rem] px-6 py-4 text-sm text-[var(--muted)]">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="mt-2 text-xs tracking-[0.2em]">
-                {email || location ? (
-                  <>
-                    Reach me via {email ? <span className="font-bold text-[var(--foreground)]">{email}</span> : null}
-                    {email && location ? ' , ' : ''}
-                    {location ?? ''}
-                  </>
-                ) : (
-                  'CMS-managed contact information'
+          <nav className="hidden items-center justify-center gap-7 md:flex" aria-label="Primary">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) =>
+                  [
+                    'text-sm transition-colors',
+                    isActive
+                      ? 'font-semibold text-white underline decoration-[1.5px] underline-offset-[10px]'
+                      : 'text-[var(--header-muted)] hover:text-white',
+                  ].join(' ')
+                }
+              >
+                {({ isActive }) => (
+                  <span aria-current={isActive ? 'page' : undefined}>{messages.nav[item.key]}</span>
                 )}
-              </p>
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="flex items-center justify-end gap-3">
+            <LanguageToggle variant="onDark" />
+            <button
+              type="button"
+              className="rounded-md p-2 text-[var(--header-fg)] md:hidden"
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
+              aria-label={menuOpen ? messages.nav.closeMenu : messages.nav.openMenu}
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        {menuOpen ? (
+          <nav id="mobile-nav" className="border-t border-[var(--header-border)] px-4 py-3 md:hidden" aria-label="Primary">
+            <div className="flex flex-col gap-1">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    [
+                      'rounded-md px-2 py-2.5 text-sm',
+                      isActive ? 'bg-white/10 font-semibold text-white' : 'text-[var(--header-muted)] hover:text-white',
+                    ].join(' ')
+                  }
+                >
+                  {messages.nav[item.key]}
+                </NavLink>
+              ))}
             </div>
-            <div className="flex flex-wrap items-center gap-3">
+          </nav>
+        ) : null}
+      </header>
+
+      <main id="main-content" className="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+        <Outlet />
+      </main>
+
+      <footer className="border-t border-[var(--border)]">
+        <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 text-sm text-[var(--muted)] sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-1">
+            <p className="font-medium text-[var(--foreground)]">{messages.brand.title}</p>
+            {email || location ? (
+              <p>
+                {email ? <a href={`mailto:${email}`} className="text-[var(--foreground)] underline-offset-4 hover:underline">{email}</a> : null}
+                {email && location ? <span> · </span> : null}
+                {location ? <span>{location}</span> : null}
+              </p>
+            ) : null}
+          </div>
+          {socialLinks.length > 0 ? (
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
               {socialLinks.map((link) => (
-                <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noreferrer" className="font-semibold text-[var(--accent)]">
+                <a
+                  key={`${link.label}-${link.url}`}
+                  href={link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[var(--accent)] underline-offset-4 hover:underline"
+                >
                   {link.label}
                 </a>
               ))}
             </div>
-          </div>
-        </footer>
-      </div>
+          ) : null}
+        </div>
+      </footer>
     </div>
   )
 }

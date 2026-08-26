@@ -1,6 +1,6 @@
 ---
 name: frontend-website-starter
-description: Build and maintain a personal website frontend using Vite, React, TypeScript, React Router, React Query, React Hook Form, shadcn/ui, Tailwind CSS, Lucide Icons, a single light theme, i18n, and JWT admin auth.
+description: Build and maintain a personal website frontend using Vite, React, TypeScript, React Router, React Query, React Hook Form, shadcn/ui, Tailwind CSS, Lucide Icons, a single light theme, i18n, and JWT admin auth. Use when creating, extending, or changing frontend-app pages, components, routing, auth UI, localization, or frontend tests.
 ---
 
 # Frontend Website Skill

@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useLocale } from '../../app/providers/locale-provider'
-import { Card } from '../../components/ui/card'
-import { Input } from '../../components/ui/input'
 import { StatusView } from '../../components/ui/status-view'
 import { publicApi } from '../../lib/api/public'
 import { PageSection } from '../shared/page-section'
@@ -19,34 +17,37 @@ export function BlogListPage() {
   })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <PageSection title={messages.blog.title} description={messages.blog.description}>
-        <div className="relative max-w-xl">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-          <Input
+        <label className="relative block max-w-xl">
+          <span className="sr-only">{messages.blog.searchPlaceholder}</span>
+          <Search className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+          <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="pl-11"
+            className="w-full border-0 border-b border-[var(--border)] bg-transparent py-3 pl-7 text-base outline-none transition-colors focus:border-[var(--accent)]"
             placeholder={messages.blog.searchPlaceholder}
           />
-        </div>
+        </label>
       </PageSection>
 
       {postsQuery.isLoading ? <StatusView title={messages.states.loading} message={messages.states.loadingContent} /> : null}
       {postsQuery.isError ? <StatusView title={messages.states.error} message={messages.states.errorContent} /> : null}
 
       {postsQuery.data ? (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <ul className="grid gap-x-10 gap-y-2 divide-y divide-[var(--border)] border-t border-[var(--border)] lg:grid-cols-2 lg:divide-y-0 lg:border-t-0">
           {postsQuery.data.map((post) => (
-            <Link key={post.id} to={`/blog/${post.slug}`}>
-              <Card className="h-full bg-[var(--surface-strong)] transition hover:-translate-y-1 hover:shadow-xl">
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent)]">{post.readingTimeMinutes} min read</p>
-                <h3 className="mt-3 text-xl font-semibold">{post.title ?? post.slug}</h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--muted)]">{post.excerpt}</p>
-              </Card>
-            </Link>
+            <li key={post.id} className="lg:border-t lg:border-[var(--border)]">
+              <Link to={`/blog/${post.slug}`} className="block py-6 transition-colors hover:text-[var(--accent)]">
+                <p className="text-xs text-[var(--muted)]">
+                  {post.readingTimeMinutes} {messages.blog.readingTime}
+                </p>
+                <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">{post.title ?? post.slug}</h3>
+                {post.excerpt ? <p className="mt-3 text-sm leading-7 text-[var(--muted)]">{post.excerpt}</p> : null}
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       ) : null}
     </div>
   )

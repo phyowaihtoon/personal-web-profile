@@ -1,16 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useAuth } from '../../app/providers/auth-provider'
 import { Button } from '../../components/ui/button'
-import { Card } from '../../components/ui/card'
 import { StatusView } from '../../components/ui/status-view'
-import { Textarea } from '../../components/ui/textarea'
+import { VisualRecordForm } from '../../features/cms/components/visual-record-form'
+import { cloneRecord, toSavePayload } from '../../features/cms/path'
+import type { CmsSchema } from '../../features/cms/types'
 
 type Props = {
   title: string
   description: string
   queryKey: string
+  schema: CmsSchema
   load: (token: string) => Promise<unknown>
   mode: 'singleton' | 'collection'
   save?: (token: string, body: Record<string, unknown>) => Promise<unknown>
@@ -20,18 +22,11 @@ type Props = {
   createTemplate?: Record<string, unknown>
 }
 
-function parseJsonObject(value: string) {
-  const parsed = JSON.parse(value) as unknown
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('JSON value must be an object.')
-  }
-  return parsed as Record<string, unknown>
-}
-
 export function CmsEditorPage({
   title,
   description,
   queryKey,
+  schema,
   load,
   mode,
   save,
@@ -48,8 +43,8 @@ export function CmsEditorPage({
     queryFn: () => load(accessToken ?? ''),
   })
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [draftText, setDraftText] = useState('')
-  const [itemDrafts, setItemDrafts] = useState<Record<string, string>>({})
+  const [singletonDraft, setSingletonDraft] = useState<Record<string, unknown>>({})
+  const [itemDrafts, setItemDrafts] = useState<Record<string, Record<string, unknown>>>({})
 
   const saveMutation = useMutation({
     mutationFn: async (payload: Record<string, unknown>) => save?.(accessToken ?? '', payload),
@@ -84,24 +79,25 @@ export function CmsEditorPage({
     },
   })
 
-  const singletonJson = useMemo(() => JSON.stringify(query.data ?? {}, null, 2), [query.data])
   const collectionItems = Array.isArray(query.data) ? (query.data as Array<Record<string, unknown>>) : []
 
   useEffect(() => {
-    if (mode === 'singleton' && query.data) {
-      setDraftText(singletonJson)
+    if (mode === 'singleton' && query.data && typeof query.data === 'object' && !Array.isArray(query.data)) {
+      setSingletonDraft(cloneRecord(query.data as Record<string, unknown>))
     }
-  }, [mode, query.data, singletonJson])
+  }, [mode, query.data])
 
   useEffect(() => {
-    if (mode === 'collection' && query.data) {
-      const next: Record<string, string> = {}
-      collectionItems.forEach((item, index) => {
-        next[String(item.id ?? `new-${index}`)] = JSON.stringify(item, null, 2)
-      })
-      setItemDrafts(next)
+    if (mode !== 'collection' || !Array.isArray(query.data)) {
+      return
     }
-  }, [collectionItems, mode, query.data])
+
+    const next: Record<string, Record<string, unknown>> = {}
+    ;(query.data as Array<Record<string, unknown>>).forEach((item, index) => {
+      next[String(item.id ?? `new-${index}`)] = cloneRecord(item)
+    })
+    setItemDrafts(next)
+  }, [mode, query.data])
 
   if (query.isLoading) {
     return <StatusView title={`Loading ${title}`} message="Fetching the latest CMS data." />
@@ -114,30 +110,27 @@ export function CmsEditorPage({
   return (
     <div className="space-y-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]">Content module</p>
-        <h1 className="display-title mt-3 text-4xl">{title}</h1>
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--accent)]">Content module</p>
+        <h1 className="mt-2 text-2xl font-semibold">{title}</h1>
         <p className="mt-3 text-sm text-[var(--muted)]">{description}</p>
       </div>
       {errorMessage ? <p className="text-sm text-red-600">{errorMessage}</p> : null}
 
       {mode === 'singleton' ? (
-        <Card className="space-y-4 bg-[var(--surface-strong)]">
-          <Textarea className="min-h-[26rem] font-mono text-xs" value={draftText || singletonJson} onChange={(event) => setDraftText(event.target.value)} />
-          <Button
-            type="button"
-            onClick={async () => {
-              try {
-                setErrorMessage(null)
-                await saveMutation.mutateAsync(parseJsonObject(draftText || singletonJson))
-              } catch (error) {
-                setErrorMessage(error instanceof Error ? error.message : 'Unable to save this resource.')
-              }
-            }}
-            disabled={!save || saveMutation.isPending}
-          >
-            {saveMutation.isPending ? 'Saving...' : 'Save changes'}
-          </Button>
-        </Card>
+        <VisualRecordForm
+          schema={schema}
+          value={singletonDraft}
+          onChange={setSingletonDraft}
+          saving={saveMutation.isPending}
+          onSave={async () => {
+            try {
+              setErrorMessage(null)
+              await saveMutation.mutateAsync(toSavePayload(singletonDraft))
+            } catch (error) {
+              setErrorMessage(error instanceof Error ? error.message : 'Unable to save this resource.')
+            }
+          }}
+        />
       ) : (
         <div className="space-y-4">
           <Button
@@ -146,7 +139,6 @@ export function CmsEditorPage({
               try {
                 setErrorMessage(null)
                 await createMutation.mutateAsync(createTemplate)
-                setItemDrafts({})
               } catch (error) {
                 setErrorMessage(error instanceof Error ? error.message : 'Unable to create this record.')
               }
@@ -156,57 +148,53 @@ export function CmsEditorPage({
             {createMutation.isPending ? 'Creating...' : 'Add record'}
           </Button>
 
+          {collectionItems.length === 0 ? (
+            <p className="text-sm text-[var(--muted)]">No records yet. Add one to start editing visually.</p>
+          ) : null}
+
           {collectionItems.map((item, index) => {
             const key = String(item.id ?? `new-${index}`)
+            const draft = itemDrafts[key] ?? item
             return (
-              <Card key={key} className="space-y-4 bg-[var(--surface-strong)]">
-                <Textarea
-                  className="min-h-[18rem] font-mono text-xs"
-                  value={itemDrafts[key] ?? JSON.stringify(item, null, 2)}
-                  onChange={(event) =>
-                    setItemDrafts((current) => ({
-                      ...current,
-                      [key]: event.target.value,
-                    }))
+              <VisualRecordForm
+                key={key}
+                schema={schema}
+                value={draft}
+                title={schema.summary?.(draft)}
+                saving={updateMutation.isPending}
+                deleting={deleteMutation.isPending}
+                onChange={(next) =>
+                  setItemDrafts((current) => ({
+                    ...current,
+                    [key]: next,
+                  }))
+                }
+                onSave={async () => {
+                  try {
+                    setErrorMessage(null)
+                    await updateMutation.mutateAsync({ id: key, payload: toSavePayload(draft) })
+                  } catch (error) {
+                    setErrorMessage(error instanceof Error ? error.message : 'Unable to update this record.')
                   }
-                />
-                <div className="flex flex-wrap gap-3">
-                  <Button
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        setErrorMessage(null)
-                        await updateMutation.mutateAsync({ id: key, payload: parseJsonObject(itemDrafts[key] ?? JSON.stringify(item, null, 2)) })
-                      } catch (error) {
-                        setErrorMessage(error instanceof Error ? error.message : 'Unable to update this record.')
+                }}
+                onDelete={
+                  remove
+                    ? async () => {
+                        try {
+                          setErrorMessage(null)
+                          await deleteMutation.mutateAsync(key)
+                          setItemDrafts((current) => {
+                            const next = { ...current }
+                            delete next[key]
+                            return next
+                          })
+                        } catch (error) {
+                          setErrorMessage(error instanceof Error ? error.message : 'Unable to delete this record.')
+                        }
                       }
-                    }}
-                    disabled={!update || updateMutation.isPending}
-                  >
-                    Save record
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={async () => {
-                      try {
-                        setErrorMessage(null)
-                        await deleteMutation.mutateAsync(key)
-                        setItemDrafts((current) => {
-                          const next = { ...current }
-                          delete next[key]
-                          return next
-                        })
-                      } catch (error) {
-                        setErrorMessage(error instanceof Error ? error.message : 'Unable to delete this record.')
-                      }
-                    }}
-                    disabled={!remove || deleteMutation.isPending}
-                  >
-                    Delete record
-                  </Button>
-                </div>
-              </Card>
+                    : undefined
+                }
+              />
             )
           })}
         </div>

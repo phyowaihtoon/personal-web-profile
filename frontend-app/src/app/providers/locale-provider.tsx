@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 import en from '../../translations/en.json'
 import my from '../../translations/my.json'
@@ -23,6 +23,10 @@ type Props = {
 
 export function LocaleProvider({ children }: Props) {
   const [locale, setLocaleState] = useState<Locale>(() => getStoredLocale())
+
+  useEffect(() => {
+    document.documentElement.lang = locale
+  }, [locale])
 
   const value = useMemo<LocaleContextValue>(
     () => ({

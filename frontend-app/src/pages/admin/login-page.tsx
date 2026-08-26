@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -23,6 +24,10 @@ export function LoginPage() {
     defaultValues: { email: '', password: '' },
   })
 
+  useEffect(() => {
+    document.title = 'Admin · Sign in'
+  }, [])
+
   const onSubmit = form.handleSubmit(async (values) => {
     await login(values)
     navigate('/admin')
@@ -30,10 +35,10 @@ export function LoginPage() {
 
   return (
     <div className="app-shell flex min-h-screen items-center justify-center px-4 py-10">
-      <Card className="w-full max-w-lg rounded-[2rem] p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]">Admin</p>
-        <h1 className="display-title mt-3 text-4xl">Sign in</h1>
-        <p className="mt-3 text-sm text-[var(--muted)]">Use the bootstrap flow only for the first admin account.</p>
+      <Card className="w-full max-w-md p-8">
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--accent)]">Admin</p>
+        <h1 className="display-title mt-3 text-3xl">Sign in</h1>
+        <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Use the bootstrap flow only for the first admin account.</p>
         <form className="mt-8 space-y-4" onSubmit={onSubmit}>
           <div>
             <label className="mb-2 block text-sm font-medium">Email</label>

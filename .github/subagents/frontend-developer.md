@@ -28,7 +28,7 @@ You implement and refine frontend features using the project stack and conventio
 - Tailwind CSS
 - JWT authentication (access token in memory, refresh via httpOnly cookie)
 - English/Myanmar localization
-- Light/Dark/System theme support
+- Single light editorial theme
 - Vitest + Testing Library
 
 ## Architecture Rules
@@ -69,8 +69,7 @@ You implement and refine frontend features using the project stack and conventio
 - Localize both UI labels and content rendering paths.
 - Support English default and Myanmar secondary.
 - Use English fallback when Myanmar content is unavailable.
-- Ensure theme toggle works consistently and persists preference.
-- Verify dark mode contrast and readability.
+- Keep the single light editorial theme; do not add a theme toggle.
 
 ## Auth Requirements (Frontend)
 
@@ -88,7 +87,7 @@ For implemented features, include or update tests for:
 - Loading/error/empty states
 - Form validation behavior
 - Auth-protected route behavior
-- Locale/theme behavior when applicable
+- Locale behavior when applicable
 
 Use:
 - Vitest
@@ -101,7 +100,7 @@ Use:
 3. New/updated types added
 4. Loading/error/empty states handled
 5. Localization keys/paths covered
-6. Theme compatibility checked
+6. Contrast and readability checked
 7. Accessibility basics verified
 8. Tests added/updated
 9. Lint/typecheck-ready output

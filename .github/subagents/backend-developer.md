@@ -24,8 +24,8 @@ You implement and refine backend features using the project stack and convention
 - TypeScript
 - Express
 - Prisma
-- SQLite (local development and testing)
-- PostgreSQL (production)
+- PostgreSQL for all environments
+- `DATABASE_TARGET` (`onprem` | `supabase`)
 - Express Validator
 - JWT authentication
 - API versioning (`/api/v1`)
@@ -54,12 +54,15 @@ You implement and refine backend features using the project stack and convention
 
 ## Database & Prisma Requirements
 
-- Use SQLite for local dev and tests.
-- Use PostgreSQL for production.
-- Keep Prisma schema portable between providers where practical.
+- Use PostgreSQL for local, on-prem, test, and cloud deployments.
+- Select target with `DATABASE_TARGET`:
+  - `onprem` → `DATABASE_URL`
+  - `supabase` → `SUPABASE_DATABASE_URL` + `SUPABASE_DIRECT_URL`
+- Keep one Prisma schema (`provider = "postgresql"`) for both targets.
 - Use migrations for schema changes.
 - Regenerate Prisma client after schema updates.
 - Use transactions when multiple writes must be atomic.
+- Do not use SQLite.
 
 ## Auth & Security Requirements
 

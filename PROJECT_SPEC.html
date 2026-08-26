@@ -372,8 +372,8 @@
               <li>Express</li>
               <li>TypeScript</li>
               <li>Prisma</li>
-              <li>SQLite for local development and testing</li>
-              <li>PostgreSQL for production</li>
+              <li>PostgreSQL for all environments (on-prem or Supabase)</li>
+              <li>Configurable database target via <code>DATABASE_TARGET</code> (<code>onprem</code> | <code>supabase</code>)</li>
               <li>Express Validator</li>
               <li>CORS</li>
               <li>JWT authentication</li>
@@ -1465,8 +1465,7 @@
 
             <h3>16.3 Data Strategy</h3>
             <ul>
-              <li>SQLite for local development and tests</li>
-              <li>PostgreSQL for production</li>
+              <li>PostgreSQL for all environments (on-prem via <code>DATABASE_TARGET=onprem</code>, Supabase via <code>DATABASE_TARGET=supabase</code>)</li>
               <li>Prisma migrations for schema evolution</li>
               <li>Modular content tables with translation tables</li>
               <li>Storage abstraction for future migration from local files to cloud storage</li>

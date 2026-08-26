@@ -11,25 +11,34 @@ This repository contains two TypeScript applications:
 
 The project is intentionally kept as a single Git repository so frontend and backend evolve together.
 
+### Current V1 behavior
+
+- Public pages are content-driven from backend APIs (Home, About, Experience, Blog). Navigation labels stay in frontend translation files.
+- Admin CMS uses schema-driven visual form editors (not raw JSON). Localized fields use English/Myanmar tabs, list fields support inline add/remove, and blog Markdown supports write/preview authoring.
+- UI and content support English and Myanmar, with English fallback when Myanmar copy is missing.
+- Public and admin UIs use a single light editorial theme. There is no light/dark/system toggle.
+- PostgreSQL is required in every environment. `DATABASE_TARGET` selects on-prem PostgreSQL or Supabase.
+- The first admin is created through a bootstrap-only flow. There is no public registration.
+
 ## Architecture
 
 - Frontend communicates with backend via `/api/v1` endpoints.
 - Backend exposes versioned REST routes for health, auth, public content, and admin operations.
-- Prisma provides database access (SQLite for local development).
-- JWT-based auth protects admin endpoints.
+- Prisma provides database access via PostgreSQL. `DATABASE_TARGET` resolves connection URLs before Prisma Client or Prisma CLI commands run.
+- JWT-based auth protects admin endpoints (access token + httpOnly refresh cookie).
 
 ```mermaid
 flowchart LR
   Browser[Frontend App\nReact + Vite] -->|HTTP /api/v1| API[Backend App\nExpress + TypeScript]
   API --> Prisma[Prisma Client]
-  Prisma --> DB[(SQLite local\nPostgreSQL-ready)]
+  Prisma --> DB[(PostgreSQL\non-prem or Supabase)]
   API --> Uploads[(Uploads Directory)]
 ```
 
 ## Technology Stack
 
-- Frontend: React 19, TypeScript, Vite, React Router, React Query, React Hook Form, Tailwind CSS
-- Backend: Node.js, Express 5, TypeScript, Prisma ORM, Zod, JWT, Multer
+- Frontend: React 19, TypeScript, Vite, React Router, React Query, React Hook Form, shadcn/ui, Tailwind CSS, Lucide Icons, English/Myanmar i18n
+- Backend: Node.js, Express 5, TypeScript, Prisma ORM, PostgreSQL, Zod, JWT, Multer
 - Testing: Vitest + Testing Library (frontend), Jest + Supertest (backend)
 - Tooling: ESLint, tsx, tsc
 
@@ -39,6 +48,7 @@ flowchart LR
 
 - Node.js 20+
 - npm 10+
+- PostgreSQL (local/on-prem, or a Supabase project)
 
 ### 1) Install dependencies
 
@@ -54,7 +64,16 @@ cd backend-app && cp .env.example .env
 cd ../frontend-app && cp .env.example .env
 ```
 
-Required backend env values include `DATABASE_URL`, `JWT_ACCESS_SECRET`, and `JWT_REFRESH_SECRET`.
+Required backend env values include `DATABASE_TARGET`, database URL(s) for that target, `JWT_ACCESS_SECRET`, and `JWT_REFRESH_SECRET`.
+
+| `DATABASE_TARGET` | When to use | Required connection env |
+| --- | --- | --- |
+| `onprem` (default) | Local development, physical/on-prem servers, or any self-managed PostgreSQL | `DATABASE_URL` |
+| `supabase` | Supabase-hosted PostgreSQL | `SUPABASE_DATABASE_URL` (pooled) and `SUPABASE_DIRECT_URL` (direct/session) |
+
+Prisma schema always uses `provider = "postgresql"`. At runtime and for `npm run prisma:*` commands, the selected target is resolved into `DATABASE_URL` + `DIRECT_URL`.
+
+Frontend only needs `VITE_BACKEND_API_URL` (defaults to `http://localhost:4000/api/v1`).
 
 ### 3) Prepare database
 
@@ -64,6 +83,39 @@ npm run prisma:generate
 npm run prisma:push
 npm run prisma:seed
 ```
+
+Optional, when iterating on schema with migrations:
+
+```bash
+npm run prisma:migrate
+```
+
+## Application Surfaces
+
+### Public site
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Home |
+| `/about` | About |
+| `/experience` | Experience |
+| `/blog` | Blog listing |
+| `/blog/:slug` | Blog detail |
+
+The public shell reads site title, contact information, social links, and page content from the API. A language toggle switches English/Myanmar.
+
+### Admin portal
+
+| Route | Purpose |
+| --- | --- |
+| `/admin/bootstrap` | Create the first admin (available only until one exists) |
+| `/admin/login` | Admin login |
+| `/admin/verify` | Token verification |
+| `/admin` | Dashboard |
+| `/admin/home`, `/admin/about`, `/admin/experience`, `/admin/projects`, `/admin/skills` | Visual CMS editors |
+| `/admin/blog/posts`, `/admin/blog/categories`, `/admin/blog/tags` | Blog CMS |
+| `/admin/uploads` | File upload management |
+| `/admin/settings` | Site settings |
 
 ## Development Workflow
 
@@ -111,9 +163,9 @@ This repository includes an App Platform spec at `.do/app.yaml` for running both
 
 ### Notes for current backend database mode
 
-- Current backend setup uses SQLite (`DATABASE_URL=file:./prisma/dev.db`) in the app spec.
-- SQLite on App Platform is suitable for demo/staging only because filesystem data is not durable across restarts/redeploys.
-- For production durability, move Prisma datasource to PostgreSQL and attach a managed database.
+- Backend uses PostgreSQL only.
+- Choose deployment target with `DATABASE_TARGET=onprem` or `DATABASE_TARGET=supabase`.
+- `.do/app.yaml` currently attaches DigitalOcean managed PostgreSQL as `DATABASE_URL`; leave that as-is unless you intentionally migrate that environment.
 
 ## Quality Checks
 
@@ -141,8 +193,11 @@ npm run build
 .
 |-- backend-app/
 |   |-- prisma/
+|   |-- scripts/
+|   |   `-- with-database-env.ts
 |   |-- src/
 |   |   |-- config/
+|   |   |   `-- database-target.ts
 |   |   |-- controllers/
 |   |   |-- middleware/
 |   |   |-- routes/v1/
@@ -156,6 +211,7 @@ npm run build
 |   |   |-- app/
 |   |   |-- components/
 |   |   |-- features/
+|   |   |   `-- cms/
 |   |   |-- lib/
 |   |   |-- pages/
 |   |   `-- translations/
@@ -167,5 +223,6 @@ npm run build
 
 ## Notes
 
-- Generated artifacts (`node_modules`, `dist`, local `.env`, SQLite runtime files) are ignored by Git.
+- Generated artifacts (`node_modules`, `dist`, local `.env`) are ignored by Git.
 - Upload files are stored locally in development and are also ignored by Git.
+- Full product requirements live in `PROJECT_SPEC.md`.

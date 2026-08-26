@@ -1,45 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f4efe7;
-  --surface: rgba(255, 250, 244, 0.86);
-  --surface-strong: #fffdf8;
-  --foreground: #201714;
-  --muted: #705a54;
-  --border: rgba(69, 43, 29, 0.14);
-  --accent: #b6561a;
-  --accent-strong: #843a0f;
-  --accent-soft: rgba(182, 86, 26, 0.12);
-  --ring: rgba(182, 86, 26, 0.24);
-  --shadow: 0 24px 80px rgba(96, 52, 25, 0.12);
-  --font-body: "Manrope", "Segoe UI", sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --foreground: #161513;
+  --muted: #5e5a54;
+  --border: #e4e0d8;
+  --accent: #1f4a3a;
+  --accent-strong: #16362b;
+  --accent-soft: #e8efe9;
+  --ring: rgba(31, 74, 58, 0.28);
+  --shadow: 0 1px 2px rgba(22, 21, 19, 0.06);
+  --font-body: "Instrument Sans", "Segoe UI", sans-serif;
+  --font-display: "Newsreader", Georgia, serif;
   font-family: var(--font-body);
   color: var(--foreground);
-  background:
-    radial-gradient(circle at top left, rgba(226, 164, 126, 0.24), transparent 32%),
-    linear-gradient(180deg, #f8f3eb 0%, #efe8dc 100%);
+  background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-:root[data-theme='dark'] {
-  --bg: #1d1715;
-  --surface: rgba(37, 30, 27, 0.88);
-  --surface-strong: #2a211d;
-  --foreground: #f7ede4;
-  --muted: #d1baaa;
-  --border: rgba(255, 235, 222, 0.12);
-  --accent: #f08b52;
-  --accent-strong: #ffb186;
-  --accent-soft: rgba(240, 139, 82, 0.16);
-  --ring: rgba(240, 139, 82, 0.28);
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
-  background:
-    radial-gradient(circle at top left, rgba(176, 83, 32, 0.2), transparent 32%),
-    linear-gradient(180deg, #171210 0%, #211916 100%);
 }
 
 * {
@@ -71,42 +52,115 @@ select {
   font: inherit;
 }
 
-#root {
-  min-height: 100vh;
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .app-shell {
   min-height: 100vh;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 30%),
-    var(--bg);
+  background: var(--bg);
 }
 
-.glass-panel {
+.site-header {
+  --header-fg: #f6f5f1;
+  --header-muted: #c8c2b8;
+  --header-border: rgba(246, 245, 241, 0.12);
+  background: color-mix(in srgb, #1c1917 94%, transparent);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: 0 8px 24px rgba(22, 21, 19, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--header-fg);
+}
+
+.site-header :focus-visible {
+  outline-color: var(--header-fg);
+}
+
+.surface-panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(14px);
 }
 
 .display-title {
   font-family: var(--font-display);
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  letter-spacing: -0.03em;
 }
 
 .prose-markdown {
   color: var(--foreground);
-  line-height: 1.75;
+  font-size: 1.0625rem;
+  line-height: 1.8;
 }
 
 .prose-markdown h1,
 .prose-markdown h2,
 .prose-markdown h3 {
   font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-markdown p,
+.prose-markdown ul,
+.prose-markdown ol {
+  margin: 1rem 0;
+}
+
+.prose-markdown a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
 }
 
 .prose-markdown pre,
 .prose-markdown code {
   background: var(--accent-soft);
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.prose-markdown pre {
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.prose-markdown code {
+  padding: 0.1rem 0.3rem;
+}
+
+.prose-markdown pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.skip-link:focus {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 50;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  background: var(--surface);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
 }

@@ -1,12 +1,20 @@
 {
   "brand": {
-    "title": "ကိုယ်ပိုင်ဝဘ်ဆိုက်စနစ်"
+    "title": "ကိုယ်ပိုင်ဝဘ်ဆိုက်စနစ်",
+    "name": "Phyo Wai Htoon",
+    "role": "Senior Software Engineer"
   },
   "nav": {
     "home": "ပင်မ",
     "about": "အကြောင်း",
     "experience": "အတွေ့အကြုံ",
-    "blog": "ဘလော့"
+    "blog": "ဘလော့",
+    "openMenu": "မီနူးဖွင့်ရန်",
+    "closeMenu": "မီနူးပိတ်ရန်"
+  },
+  "a11y": {
+    "skipToContent": "အကြောင်းအရာသို့ ကျော်ရန်",
+    "language": "ဘာသာစကား"
   },
   "footer": {
     "tagline": "Content-driven public site နှင့် admin portal.",
@@ -26,20 +34,26 @@
     "skillsTitle": "Tech Stack",
     "skillsOverview": "Frontend သည် hardcoded text အစား API data ကိုအသုံးပြုသည်။",
     "featuredProjects": "ရွေးချယ်ထားသော projects",
-    "latestPosts": "နောက်ဆုံး posts"
+    "latestPosts": "နောက်ဆုံး posts",
+    "readingTime": "မိနစ် ဖတ်ရန်",
+    "photoAlt": "Phyo Wai Htoon ၏ ပုံ"
   },
   "about": {
     "title": "အကြောင်း",
-    "timelineTitle": "Career timeline"
+    "timelineTitle": "Career timeline",
+    "skills": "ကျွမ်းကျင်မှု",
+    "interests": "စိတ်ဝင်စားမှု"
   },
   "experience": {
     "title": "အတွေ့အကြုံ",
-    "skillsTitle": "Skills overview"
+    "skillsTitle": "Skills overview",
+    "present": "ယခု"
   },
   "blog": {
     "title": "ရေးသားချက်များ",
     "description": "Search နှင့် related content ပါဝင်သော published Markdown posts များ။",
     "searchPlaceholder": "Title သို့မဟုတ် content ဖြင့် search လုပ်ပါ",
-    "relatedPosts": "ဆက်စပ် posts"
+    "relatedPosts": "ဆက်စပ် posts",
+    "readingTime": "မိနစ် ဖတ်ရန်"
   }
 }

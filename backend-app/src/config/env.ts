@@ -2,12 +2,17 @@ import path from 'node:path'
 import dotenv from 'dotenv'
 import { z } from 'zod'
 
+import { applyDatabaseEnv, DATABASE_TARGETS } from './database-target'
+
 dotenv.config()
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(4000),
-  DATABASE_URL: z.string().min(1),
+  DATABASE_TARGET: z.enum(DATABASE_TARGETS).default('onprem'),
+  DATABASE_URL: z.string().optional(),
+  SUPABASE_DATABASE_URL: z.string().optional(),
+  SUPABASE_DIRECT_URL: z.string().optional(),
   JWT_ACCESS_SECRET: z.string().min(16),
   JWT_REFRESH_SECRET: z.string().min(16),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
@@ -32,6 +37,9 @@ if (!parsed.success) {
   throw new Error(`Invalid environment configuration: ${parsed.error.message}`)
 }
 
+process.env.DATABASE_TARGET = parsed.data.DATABASE_TARGET
+const database = applyDatabaseEnv()
+
 if (parsed.data.UPLOAD_STORAGE === 's3') {
   const requiredKeys: Array<keyof typeof parsed.data> = [
     'SPACES_REGION',
@@ -49,5 +57,8 @@ if (parsed.data.UPLOAD_STORAGE === 's3') {
 
 export const env = {
   ...parsed.data,
+  DATABASE_TARGET: database.databaseTarget,
+  DATABASE_URL: database.databaseUrl,
+  DIRECT_URL: database.directUrl,
   uploadDirAbsolute: path.resolve(process.cwd(), parsed.data.UPLOAD_DIR),
 }

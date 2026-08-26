@@ -4,10 +4,8 @@ import { Link, useParams } from 'react-router-dom'
 import remarkGfm from 'remark-gfm'
 
 import { useLocale } from '../../app/providers/locale-provider'
-import { Card } from '../../components/ui/card'
 import { StatusView } from '../../components/ui/status-view'
 import { publicApi } from '../../lib/api/public'
-import { PageSection } from '../shared/page-section'
 
 export function BlogDetailPage() {
   const { slug = '' } = useParams()
@@ -23,34 +21,48 @@ export function BlogDetailPage() {
   }
 
   const post = postQuery.data
+  const publishedLabel = post.publishedAt
+    ? new Intl.DateTimeFormat(locale === 'my' ? 'my-MM' : 'en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }).format(new Date(post.publishedAt))
+    : null
 
   return (
-    <div className="space-y-6">
-      <PageSection eyebrow={messages.nav.blog} title={post.title ?? post.slug} description={post.excerpt}>
-        <div className="flex flex-wrap gap-3 text-sm text-[var(--muted)]">
-          <span>{post.readingTimeMinutes} min read</span>
-          <span>{post.publishedAt ?? 'Draft preview'}</span>
-        </div>
-      </PageSection>
+    <article className="mx-auto max-w-2xl">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--accent)]">{messages.nav.blog}</p>
+      <h1 className="display-title mt-4 text-4xl leading-tight sm:text-5xl">{post.title ?? post.slug}</h1>
+      {post.excerpt ? <p className="mt-4 text-lg leading-8 text-[var(--muted)]">{post.excerpt}</p> : null}
+      <p className="mt-5 text-sm text-[var(--muted)]">
+        <span>{post.readingTimeMinutes} {messages.blog.readingTime}</span>
+        {publishedLabel ? (
+          <>
+            <span aria-hidden="true"> · </span>
+            <time dateTime={post.publishedAt ?? undefined}>{publishedLabel}</time>
+          </>
+        ) : null}
+      </p>
 
-      <Card className="bg-[var(--surface-strong)]">
-        <div className="prose-markdown">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.contentMarkdown ?? ''}</ReactMarkdown>
-        </div>
-      </Card>
+      <div className="prose-markdown mt-10 border-t border-[var(--border)] pt-8">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.contentMarkdown ?? ''}</ReactMarkdown>
+      </div>
 
-      <PageSection title={messages.blog.relatedPosts}>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {post.relatedPosts.map((related) => (
-            <Link key={related.id} to={`/blog/${related.slug}`}>
-              <Card className="h-full bg-[var(--surface-strong)]">
-                <h3 className="text-lg font-semibold">{related.title ?? related.slug}</h3>
-                <p className="mt-3 text-sm text-[var(--muted)]">{related.excerpt}</p>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </PageSection>
-    </div>
+      {post.relatedPosts.length > 0 ? (
+        <section className="mt-16 border-t border-[var(--border)] pt-8">
+          <h2 className="display-title text-2xl">{messages.blog.relatedPosts}</h2>
+          <ul className="mt-4 space-y-4">
+            {post.relatedPosts.map((related) => (
+              <li key={related.id}>
+                <Link to={`/blog/${related.slug}`} className="text-[var(--accent)] underline-offset-4 hover:underline">
+                  {related.title ?? related.slug}
+                </Link>
+                {related.excerpt ? <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{related.excerpt}</p> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </article>
   )
 }

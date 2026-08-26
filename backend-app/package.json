@@ -11,9 +11,10 @@
     "deploy:build": "npm run prisma:generate && npm run build && npm run prisma:push && npm run prisma:seed",
     "lint": "eslint .",
     "test": "jest --runInBand --config jest.config.cjs",
-    "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:generate": "tsx scripts/with-database-env.ts generate",
+    "prisma:push": "tsx scripts/with-database-env.ts db push",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:migrate": "tsx scripts/with-database-env.ts migrate dev"
   },
   "keywords": [
     "express",

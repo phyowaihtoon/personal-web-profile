@@ -48,12 +48,12 @@ export function UploadsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]">Uploads</p>
-        <h1 className="display-title mt-3 text-4xl">Local media library</h1>
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--accent)]">Uploads</p>
+        <h1 className="mt-2 text-2xl font-semibold">Local media library</h1>
         <p className="mt-3 text-sm text-[var(--muted)]">Upload images or documents for content association.</p>
       </div>
 
-      <Card className="space-y-4 bg-[var(--surface-strong)]">
+      <Card className="space-y-4">
         <Input type="file" onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)} />
         {errorMessage ? <p className="text-sm text-red-600">{errorMessage}</p> : null}
         <Button
@@ -86,7 +86,7 @@ export function UploadsPage() {
                 : `/${uploadPath}`
 
           return (
-            <Card key={String(upload.id)} className="bg-[var(--surface-strong)]">
+            <Card key={String(upload.id)}>
               <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent)]">{String(upload.kind ?? 'file')}</p>
               <h2 className="mt-3 text-xl font-semibold">{String(upload.originalName ?? upload.storedName ?? upload.id)}</h2>
               <p className="mt-2 text-sm text-[var(--muted)]">{String(upload.path ?? '')}</p>

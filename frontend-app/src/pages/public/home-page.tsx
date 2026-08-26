@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 
 import { useLocale } from '../../app/providers/locale-provider'
-import { Card } from '../../components/ui/card'
 import { StatusView } from '../../components/ui/status-view'
 import { publicApi } from '../../lib/api/public'
 import { PageSection } from '../shared/page-section'
@@ -24,38 +24,48 @@ export function HomePage() {
   const showLatestPosts = visibility.latestPosts !== false
 
   return (
-    <div className="space-y-6">
-      <PageSection
-        title={hero?.heroTitle ?? messages.home.fallbackTitle}
-        description={hero?.heroSubtitle ?? messages.home.fallbackSubtitle}
-      >
-        <div className="grid gap-6">
-          <Card className="rounded-[2rem] bg-[var(--surface-strong)]">
-            <p className="text-sm leading-7 text-[var(--muted)]">{hero?.introText ?? messages.home.fallbackIntro}</p>
-          </Card>
-          {showSkillsOverview ? (
-            <Card className="rounded-[2rem] bg-[linear-gradient(135deg,var(--accent-soft),transparent)]">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">{messages.home.skillsTitle}</p>
-              <p className="mt-4 text-sm leading-7 text-[var(--muted)]">{hero?.skillsOverviewText ?? messages.home.skillsOverview}</p>
-            </Card>
-          ) : null}
-        </div>
-      </PageSection>
+    <div className="space-y-16">
+      <section className="max-w-3xl">
+        <h1 className="display-title text-4xl leading-tight text-[var(--foreground)] sm:text-5xl">
+          {hero?.heroTitle ?? messages.home.fallbackTitle}
+        </h1>
+        <p className="mt-4 text-lg leading-8 text-[var(--muted)]">
+          {hero?.heroSubtitle ?? messages.home.fallbackSubtitle}
+        </p>
+        <p className="mt-6 text-base leading-8 text-[var(--foreground)]">
+          {hero?.introText ?? messages.home.fallbackIntro}
+        </p>
+      </section>
 
-      <div className="grid gap-6">
-        {showLatestPosts ? (
-          <PageSection title={hero?.latestBlogHeading ?? messages.home.latestPosts}>
-            <div className="grid gap-4">
+      {showSkillsOverview ? (
+        <PageSection title={messages.home.skillsTitle}>
+          <p className="max-w-3xl text-base leading-8 text-[var(--muted)]">
+            {hero?.skillsOverviewText ?? messages.home.skillsOverview}
+          </p>
+        </PageSection>
+      ) : null}
+
+      {showLatestPosts ? (
+        <PageSection title={hero?.latestBlogHeading ?? messages.home.latestPosts}>
+          {latestPosts.length === 0 ? null : (
+            <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
               {latestPosts.map((post) => (
-                <Card key={post.id} className="rounded-[1.5rem] bg-[var(--surface-strong)]">
-                  <h3 className="text-lg font-semibold">{post.title ?? post.slug}</h3>
-                  <p className="mt-2 text-sm text-[var(--muted)]">{post.excerpt}</p>
-                </Card>
+                <li key={post.id}>
+                  <Link to={`/blog/${post.slug}`} className="block py-5 transition-colors hover:text-[var(--accent)]">
+                    <div className="flex flex-wrap items-baseline justify-between gap-3">
+                      <h3 className="text-lg font-semibold text-[var(--foreground)]">{post.title ?? post.slug}</h3>
+                      <span className="text-xs text-[var(--muted)]">
+                        {post.readingTimeMinutes} {messages.home.readingTime}
+                      </span>
+                    </div>
+                    {post.excerpt ? <p className="mt-2 text-sm leading-7 text-[var(--muted)]">{post.excerpt}</p> : null}
+                  </Link>
+                </li>
               ))}
-            </div>
-          </PageSection>
-        ) : null}
-      </div>
+            </ul>
+          )}
+        </PageSection>
+      ) : null}
     </div>
   )
 }

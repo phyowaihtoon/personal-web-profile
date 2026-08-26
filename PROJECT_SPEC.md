@@ -25,7 +25,7 @@ The system is **content-driven from the backend**. Public pages must not rely on
 The platform must support:
 
 - **English** and **Myanmar**
-- **Light/Dark/System theme**
+- **Single light editorial theme**
 - **JWT authentication**
 - **API versioning**
 - **Clean modular architecture**
@@ -34,7 +34,7 @@ The platform must support:
 ## Current V1 Implementation Notes
 
 - The current backend implementation stores localized resource variants in JSON fields per entity instead of separate translation tables. The API still resolves English/Myanmar content with English field-level fallback.
-- The current admin CMS implementation provides generic JSON editors plus file upload management for all modules. Blog content is still authored as Markdown, but the V1 admin UI edits it through JSON-backed forms rather than a dedicated rich Markdown editor.
+- The current admin CMS implementation provides schema-driven visual form editors plus file upload management for all modules. Localized fields use English/Myanmar tabs, list fields support inline add/remove, and blog Markdown supports write/preview authoring.
 - The current frontend public shell reads site title, contact information, social links, and page content from backend APIs; navigation labels remain frontend-localized UI strings.
 
 ---
@@ -74,7 +74,6 @@ The platform must support:
 - Blog listing and blog detail pages
 - Simple contact/social information display
 - Language switcher
-- Theme switcher
 - SEO metadata support
 - Responsive UI
 
@@ -143,7 +142,7 @@ The platform must support:
 - Lucide Icons
 - JWT auth integration
 - English/Myanmar localization
-- Light/Dark/System theme support
+- Single light theme
 - Vitest for testing
 
 ## Backend
@@ -151,8 +150,8 @@ The platform must support:
 - Express
 - TypeScript
 - Prisma
-- SQLite for local development and testing
-- PostgreSQL for production
+- PostgreSQL for all environments (on-prem or Supabase)
+- Configurable database target via `DATABASE_TARGET` (`onprem` | `supabase`)
 - Express Validator
 - CORS
 - JWT authentication
@@ -160,6 +159,17 @@ The platform must support:
 - Jest and Supertest for testing
 - ESLint + TypeScript ESLint
 - `tsx` for development watch mode
+
+### Database deployment targets
+
+PostgreSQL is required in every environment. Choose the connection source with `DATABASE_TARGET`:
+
+| `DATABASE_TARGET` | When to use | Required connection env |
+| --- | --- | --- |
+| `onprem` (default) | Local development, physical/on-prem servers, or any self-managed PostgreSQL | `DATABASE_URL` |
+| `supabase` | Supabase-hosted PostgreSQL | `SUPABASE_DATABASE_URL` (pooled) and `SUPABASE_DIRECT_URL` (direct/session) |
+
+Prisma schema always uses `provider = "postgresql"`. At runtime and for Prisma CLI commands, the selected target is resolved into `DATABASE_URL` + `DIRECT_URL`.
 
 ---
 
@@ -171,7 +181,6 @@ The platform must support:
 
 - Can browse all published public content
 - Can switch language
-- Can switch theme
 - Can search blog content
 - Cannot access admin features
 
@@ -299,13 +308,7 @@ If Myanmar content is missing, the frontend must **fallback to English**.
 
 ## 7.7 Theme
 
-The public website must support:
-
-- System default theme
-- Light theme
-- Dark theme
-
-Theme selection must persist between visits.
+The public website and admin portal use a **single light editorial theme**. There is no light/dark/system theme switcher.
 
 ---
 
@@ -478,7 +481,7 @@ Must support:
 - Keyboard navigation support
 - Semantic HTML
 - Accessible forms
-- Contrast-safe themes
+- Contrast-safe color tokens
 - Proper labels and focus states
 
 ## 9.4 Responsiveness
@@ -506,6 +509,7 @@ Support latest stable versions of:
 - Reusable components/services
 - Versioned API
 - Environment-based configuration
+- Database target selection via `DATABASE_TARGET` (`onprem` for local/physical PostgreSQL, `supabase` for Supabase PostgreSQL)
 
 ## 9.7 Security
 
@@ -953,7 +957,6 @@ Recommended common query support:
 - Header
 - Navigation
 - Language toggle
-- Theme toggle
 - Main content area
 - Footer with social/contact information
 
@@ -971,7 +974,6 @@ Recommended common query support:
 - Strong readability
 - Responsive layout
 - Accessible navigation
-- Good dark mode behavior
 - Localized text and content fallback
 
 ## 13.2 Admin UI

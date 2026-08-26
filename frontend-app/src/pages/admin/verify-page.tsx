@@ -12,13 +12,19 @@ export function VerifyPage() {
   }, [verifyCurrentToken])
 
   if (isValid === null) {
-    return <StatusView title="Verifying token" message="Checking whether the current access token is valid." />
+    return (
+      <div className="app-shell flex min-h-screen items-center justify-center px-4">
+        <StatusView title="Verifying token" message="Checking whether the current access token is valid." />
+      </div>
+    )
   }
 
   return (
-    <StatusView
-      title={isValid ? 'Session is valid' : 'Session is not valid'}
-      message={isValid ? 'The admin access token is active.' : 'Sign in again to restore the admin session.'}
-    />
+    <div className="app-shell flex min-h-screen items-center justify-center px-4">
+      <StatusView
+        title={isValid ? 'Session is valid' : 'Session is not valid'}
+        message={isValid ? 'The admin access token is active.' : 'Sign in again to restore the admin session.'}
+      />
+    </div>
   )
 }

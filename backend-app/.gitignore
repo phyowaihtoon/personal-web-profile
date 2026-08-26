@@ -10,7 +10,4 @@ coverage/
 uploads/
 test-uploads/
 
-prisma/*.db
-prisma/*.db-journal
-
 *.log

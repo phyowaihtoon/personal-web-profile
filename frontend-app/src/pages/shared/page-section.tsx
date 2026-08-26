@@ -4,16 +4,20 @@ type Props = {
   eyebrow?: string
   title: string
   description?: string
-  children: ReactNode
+  children?: ReactNode
 }
 
 export function PageSection({ eyebrow, title, description, children }: Props) {
   return (
-    <section className="glass-panel rounded-[2rem] p-6 sm:p-8">
-      {eyebrow ? <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]">{eyebrow}</p> : null}
-      <h2 className="display-title mt-3 text-3xl text-[var(--foreground)] sm:text-4xl">{title}</h2>
-      {description ? <p className="mt-3 max-w-3xl text-sm text-[var(--muted)]">{description}</p> : null}
-      <div className="mt-6">{children}</div>
+    <section className="space-y-5">
+      <header className="max-w-3xl space-y-3">
+        {eyebrow ? (
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--accent)]">{eyebrow}</p>
+        ) : null}
+        <h2 className="display-title text-3xl text-[var(--foreground)] sm:text-4xl">{title}</h2>
+        {description ? <p className="text-base leading-7 text-[var(--muted)]">{description}</p> : null}
+      </header>
+      {children ? <div>{children}</div> : null}
     </section>
   )
 }

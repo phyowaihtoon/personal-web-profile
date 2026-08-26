@@ -1,27 +1,45 @@
 import { useLocale } from '../../app/providers/locale-provider'
-import { Button } from '../ui/button'
+import { cn } from '../../lib/cn'
 
-export function LanguageToggle() {
-  const { locale, setLocale } = useLocale()
+type Props = {
+  variant?: 'default' | 'onDark'
+}
+
+export function LanguageToggle({ variant = 'default' }: Props) {
+  const { locale, setLocale, messages } = useLocale()
+  const onDark = variant === 'onDark'
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] p-1">
-      <Button
-        type="button"
-        variant={locale === 'en' ? 'primary' : 'ghost'}
-        className="rounded-full px-3 py-2 text-xs"
-        onClick={() => setLocale('en')}
-      >
-        EN
-      </Button>
-      <Button
-        type="button"
-        variant={locale === 'my' ? 'primary' : 'ghost'}
-        className="rounded-full px-3 py-2 text-xs"
-        onClick={() => setLocale('my')}
-      >
-        MY
-      </Button>
+    <div
+      role="group"
+      aria-label={messages.a11y.language}
+      className={cn(
+        'inline-flex items-center p-0.5',
+        onDark ? 'border border-[var(--header-border)] bg-white/5' : 'border border-[var(--border)] bg-[var(--surface)]',
+      )}
+    >
+      {(['en', 'my'] as const).map((value) => {
+        const isActive = locale === value
+
+        return (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={isActive}
+            className={cn(
+              'rounded-sm px-2.5 py-1 text-xs font-medium uppercase tracking-wide transition-colors',
+              isActive
+                ? 'bg-[var(--accent)] text-white'
+                : onDark
+                  ? 'text-[var(--header-muted)] hover:text-[var(--header-fg)]'
+                  : 'text-[var(--muted)] hover:text-[var(--foreground)]',
+            )}
+            onClick={() => setLocale(value)}
+          >
+            {value}
+          </button>
+        )
+      })}
     </div>
   )
 }
